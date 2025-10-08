@@ -1,5 +1,5 @@
 # para la expiracion del token
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from fastapi import Depends, HTTPException, APIRouter
 from pydantic import BaseModel
@@ -90,7 +90,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
         expire_date = payload.get("exp")
-        if datetime.utcnow() > datetime.fromtimestamp(expire_date):
+        if datetime.utcnow() > datetime.utcfromtimestamp(expire_date):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token has expired",
