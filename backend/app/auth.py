@@ -90,7 +90,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
         expire_date = payload.get("exp")
-        print(expire_date)
         if datetime.utcnow() > datetime.fromtimestamp(expire_date):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
