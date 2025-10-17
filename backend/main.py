@@ -3,11 +3,13 @@ from typing import Annotated
 from app.database import engine, SessionLocal
 from app.models import user
 from sqlalchemy.orm import Session
-from  app import auth
-from app.auth import get_current_user
+from app.routers import auth
+from app.routers.auth import get_current_user
+from app.routers import routines
 
 app = FastAPI()
 app.include_router(auth.router)
+app.include_router(routines.router)
 
 user.Base.metadata.create_all(bind=engine)
 
