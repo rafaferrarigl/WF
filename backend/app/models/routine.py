@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
+from app.models.exercise import Exercise
 
 class Routine(Base):
     __tablename__ = "routines"

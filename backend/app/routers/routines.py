@@ -6,6 +6,8 @@ from datetime import datetime
 from app.database import SessionLocal
 from app.models.routine import Routine
 from app.models.user import User
+from app.models.exercise import Exercise
+from app.routers.exercises import ExerciseResponse
 from app.routers.auth import get_current_user  # ✅ solo usamos esta
 from pydantic import BaseModel, Field
 
@@ -27,10 +29,12 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 # ---------------------- 📦 Esquemas Pydantic ----------------------
 
+
 class RoutineCreate(BaseModel):
     name: str = Field(..., example="Rutina de fuerza - Semana 1")
     description: str | None = Field(None, example="Enfocada en tren inferior y fuerza máxima")
     client_id: int = Field(..., example=3)
+    exercise_ids: List[int] = []  # <-- Lista de IDs de ejercicios existentes
 
 class RoutineResponse(BaseModel):
     id: int
@@ -39,9 +43,12 @@ class RoutineResponse(BaseModel):
     created_at: datetime
     trainer_id: int
     client_id: int
+    exercises: list[ExerciseResponse] = []  # <-- aquí se listarán los ejercicios asociados
 
     class Config:
         orm_mode = True
+
+
 
 
 # ---------------------- 👨‍🏫 Crear rutina (solo entrenadores) ----------------------
@@ -63,17 +70,25 @@ async def create_routine(
     if not client:
         raise HTTPException(status_code=404, detail="Cliente no encontrado.")
 
+    # Crear rutina
     new_routine = Routine(
         name=routine_request.name,
         description=routine_request.description,
         trainer_id=current_user["id"],
-        client_id=routine_request.client_id,
-        created_at=datetime.utcnow()
+        client_id=routine_request.client_id
     )
-
     db.add(new_routine)
     db.commit()
     db.refresh(new_routine)
+
+    # Asociar ejercicios por ID
+    for ex_id in routine_request.exercise_ids:
+        exercise = db.query(Exercise).filter(Exercise.id == ex_id).first()
+        if not exercise:
+            raise HTTPException(status_code=404, detail=f"Ejercicio {ex_id} no encontrado")
+        exercise.routine_id = new_routine.id
+        db.add(exercise)
+    db.commit()
 
     return new_routine
 
