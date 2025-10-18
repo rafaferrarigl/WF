@@ -1,6 +1,6 @@
 # app/routers/auth.py
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import Annotated
 from fastapi import Depends, HTTPException, APIRouter
 from pydantic import BaseModel
@@ -39,7 +39,9 @@ class CreateUserRequest(BaseModel):
     email: str
     password: str
     is_admin: bool = False  # 👈 campo opcional (por defecto False)
-
+    birth_date: date | None = None
+    height: float | None = None
+    weight: float | None = None
 
 
 class Token(BaseModel):
@@ -77,11 +79,15 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         )
 
     create_user_model = User(
-        username=create_user_request.username,
-        email=create_user_request.email,
-        password=bcrypt_context.hash(create_user_request.password),
-        is_admin=create_user_request.is_admin  # ✅ respetamos el campo
+    username=create_user_request.username,
+    email=create_user_request.email,
+    password=bcrypt_context.hash(create_user_request.password),
+    is_admin=create_user_request.is_admin,
+    birth_date=create_user_request.birth_date,
+    height=create_user_request.height,
+    weight=create_user_request.weight
     )
+
 
     db.add(create_user_model)
     db.commit()
