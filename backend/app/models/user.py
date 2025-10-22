@@ -14,3 +14,7 @@ class User(Base):
     birth_date = Column(Date, nullable=True)  # Fecha de nacimiento
     height = Column(Float, nullable=True)     # Altura en metros
     weight = Column(Float, nullable=True)     # Peso en kg
+    gender = Column(String, nullable=True)        # Género
+    
+    
+    

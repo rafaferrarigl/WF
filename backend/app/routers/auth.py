@@ -53,7 +53,7 @@ class CreateUserRequest(BaseModel):
     birth_date: date | None = None
     height: float | None = None
     weight: float | None = None
-
+    gender: str | None = None
 
 class Token(BaseModel):
     access_token: str
@@ -100,6 +100,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         birth_date=create_user_request.birth_date,
         height=create_user_request.height,
         weight=create_user_request.weight,
+        gender=create_user_request.gender,
     )
 
     db.add(create_user_model)
@@ -142,7 +143,7 @@ def authenticate_user(username: str, password: str, db: Session):
     user = db.query(User).filter(User.username == username).first()
     if not user:
         return False
-    if not bcrypt_context.verify(password, user.password):
+    if not bcrypt_context.verify(password, user.hashed_password):
         return False
     return user
 

@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import Annotated, List
 from datetime import datetime
 from pydantic import BaseModel, Field
 
 from app.database import SessionLocal
 from app.models.diet import Diet
+from app.models.meal import Meal
+from app.models.food import Food
 from app.models.user import User
 from app.routers.auth import get_current_user
-
 
 router = APIRouter(
     prefix="/diets",
@@ -25,25 +26,46 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-
 # ---------------------- 📦 Esquemas Pydantic ----------------------
 
-class DietCreate(BaseModel):
-    name: str = Field(..., example="Dieta de definición - Semana 1")
-    description: str | None = Field(None, example="Alta en proteínas, baja en carbohidratos")
-    client_id: int = Field(..., example=3)
+class FoodResponse(BaseModel):
+    id: int
+    name: str
+    grams: float
+    protein: float
+    carbs: float
+    fats: float
+
+    class Config:
+        orm_mode = True
+
+
+class MealResponse(BaseModel):
+    id: int
+    name: str
+    total_calories: float
+    foods: List[FoodResponse] = []
+
+    class Config:
+        orm_mode = True
 
 
 class DietResponse(BaseModel):
     id: int
     name: str
-    description: str | None
-    created_at: datetime
     trainer_id: int
     client_id: int
+    created_at: datetime
+    meals: List[MealResponse] = []
 
     class Config:
         orm_mode = True
+
+
+class DietCreate(BaseModel):
+    name: str = Field(..., example="Dieta de definición - Semana 1")
+    client_id: int = Field(..., example=3)
+    meal_ids: List[int] = []  # IDs de comidas existentes
 
 
 # ---------------------- 👨‍🏫 Crear dieta (solo entrenadores) ----------------------
@@ -53,21 +75,17 @@ async def create_diet(
     db: db_dependency,
     current_user=Depends(get_current_user)
 ):
-    # 🚫 Solo los entrenadores pueden crear dietas
+    # Solo entrenadores
     if not current_user["is_admin"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Solo los entrenadores pueden crear dietas."
-        )
+        raise HTTPException(status_code=403, detail="Solo entrenadores pueden crear dietas.")
 
-    # ✅ Verificar que el cliente exista
+    # Verificar que el cliente exista
     client = db.query(User).filter(User.id == diet_request.client_id).first()
     if not client:
         raise HTTPException(status_code=404, detail="Cliente no encontrado.")
 
     new_diet = Diet(
         name=diet_request.name,
-        description=diet_request.description,
         trainer_id=current_user["id"],
         client_id=diet_request.client_id,
         created_at=datetime.utcnow()
@@ -76,6 +94,15 @@ async def create_diet(
     db.add(new_diet)
     db.commit()
     db.refresh(new_diet)
+
+    # Asociar comidas existentes por ID
+    for meal_id in diet_request.meal_ids:
+        meal = db.query(Meal).filter(Meal.id == meal_id).first()
+        if not meal:
+            raise HTTPException(status_code=404, detail=f"Comida {meal_id} no encontrada.")
+        meal.diet_id = new_diet.id
+        db.add(meal)
+    db.commit()
 
     return new_diet
 
@@ -86,12 +113,20 @@ async def get_all_diets(
     db: db_dependency,
     current_user=Depends(get_current_user)
 ):
-    # 🧠 Entrenadores ven las dietas que crearon
     if current_user["is_admin"]:
-        diets = db.query(Diet).filter(Diet.trainer_id == current_user["id"]).all()
+        diets = (
+            db.query(Diet)
+            .options(joinedload(Diet.meals).joinedload(Meal.foods))
+            .filter(Diet.trainer_id == current_user["id"])
+            .all()
+        )
     else:
-        # 🏋️ Clientes ven solo las suyas
-        diets = db.query(Diet).filter(Diet.client_id == current_user["id"]).all()
+        diets = (
+            db.query(Diet)
+            .options(joinedload(Diet.meals).joinedload(Meal.foods))
+            .filter(Diet.client_id == current_user["id"])
+            .all()
+        )
 
     return diets
 
@@ -103,15 +138,19 @@ async def get_diet(
     db: db_dependency,
     current_user=Depends(get_current_user)
 ):
-    diet = db.query(Diet).filter(Diet.id == diet_id).first()
+    diet = (
+        db.query(Diet)
+        .options(joinedload(Diet.meals).joinedload(Meal.foods))
+        .filter(Diet.id == diet_id)
+        .first()
+    )
     if not diet:
         raise HTTPException(status_code=404, detail="Dieta no encontrada.")
 
-    # ⚖️ Solo el entrenador o el cliente asignado pueden verla
+    # Solo el entrenador o el cliente asignado pueden verla
     if not (
-        current_user["is_admin"] and diet.trainer_id == current_user["id"]
-    ) and not (
-        not current_user["is_admin"] and diet.client_id == current_user["id"]
+        (current_user["is_admin"] and diet.trainer_id == current_user["id"])
+        or (not current_user["is_admin"] and diet.client_id == current_user["id"])
     ):
         raise HTTPException(status_code=403, detail="No tienes permiso para ver esta dieta.")
 

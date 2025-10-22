@@ -6,7 +6,7 @@ from app.models.exercise import Exercise
 from app.routers.auth import get_current_user
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/exercises", tags=["exercises"])
+router = APIRouter(prefix="/exercises", tags=["routines"])
 
 # ---------------------- 🔧 Dependencia DB ----------------------
 def get_db():
