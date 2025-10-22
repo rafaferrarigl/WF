@@ -13,6 +13,8 @@ from app.routers.auth import get_current_user
 from app.routers import routines
 from app.routers import exercises
 from app.routers import diets
+from app.routers import meal
+from app.routers import food
 from sqlalchemy.orm import Session
 
 app = FastAPI()
@@ -20,6 +22,8 @@ app.include_router(auth.router)
 app.include_router(routines.router)
 app.include_router(diets.router)
 app.include_router(exercises.router)
+app.include_router(meal.router)
+app.include_router(food.router)
 
 Base.metadata.create_all(bind=engine)
 
