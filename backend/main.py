@@ -16,6 +16,8 @@ from app.routers import diets
 from app.routers import meal
 from app.routers import food
 from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
 app.include_router(auth.router)
@@ -26,6 +28,15 @@ app.include_router(meal.router)
 app.include_router(food.router)
 
 Base.metadata.create_all(bind=engine)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # 👈 tu frontend Vite
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db():
     db = SessionLocal()
@@ -38,8 +49,8 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
-@app.get("/", status_code=status.HTTP_200_OK, tags=["user"])
-async def user(user:user_dependency, db: db_dependency):
+@app.get("/auth/me", tags=["auth"])
+async def get_me(user: user_dependency):
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return {"User": user}
+    return user  # 👈 devolvemos el user directamente, sin el wrapper {"User": ...}
