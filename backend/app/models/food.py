@@ -1,16 +1,20 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from __future__ import annotations
+
+from sqlalchemy import Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
 from app.database import Base
 
+
 class Food(Base):
-    __tablename__ = "foods"
+    __tablename__ = 'foods'
 
     id = Column(Integer, primary_key=True, index=True)
-    meal_id = Column(Integer, ForeignKey("meals.id"))
+    meal_id = Column(Integer, ForeignKey('meals.id'))
     name = Column(String, nullable=False)
     protein = Column(Float, default=0)
     carbs = Column(Float, default=0)
     fats = Column(Float, default=0)
     grams = Column(Float, default=0)
 
-    meal = relationship("Meal", back_populates="foods")
+    meal = relationship('Meal', back_populates='foods')

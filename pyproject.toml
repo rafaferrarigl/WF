@@ -1,0 +1,88 @@
+[project]
+name = 'backend'
+version = '1.0.0'
+requires-python = '>=3.12'
+dependencies = [
+    'sqlalchemy~=2.0.44',
+    'fastapi~=0.120.2',
+    "dotenv>=0.9.9",
+    "passlib>=1.7.4",
+    "python-jose>=3.5.0",
+]
+optional-dependencies = { }
+
+description = 'Project description'
+authors = [
+    { name = 'Name Surname', email = 'email@site.com' }
+]
+maintainers = []
+
+license = 'MIT'
+#license-files = ['LICENSE.md']
+#readme = 'README.md'
+
+keywords = []
+classifiers = [
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
+]
+
+[project.urls]
+Homepage = 'https://module.com'
+Documentation = 'https://readthedocs.org/module'
+Repository = 'https://github.com/user/module.git'
+Issues = 'https://github.com/user/module/issues'
+Changelog = 'https://github.com/user/module/blob/master/CHANGELOG.md'
+Download = 'https://github.com/user/module/release/v0.0.0'
+
+[project.scripts]
+#:null:
+
+[project.gui-scripts]
+#:null:
+
+
+[build-system]
+requires = ['uv_build~=0.9.5']
+build-backend = 'uv_build'
+
+
+[dependency-groups]
+dev = [
+    'pre-commit~=4.3.0',
+    { include-group = 'lint' },
+    { include-group = 'test' }
+]
+lint = ['ruff~=0.14.2', 'pyrefly~=0.39.1']
+test = ['pytest~=8.4.2']
+
+
+[tool.uv]
+conflicts = []
+default-groups = []
+#:deprecated: dev-dependencies = []
+environments = []
+managed = true
+package = true
+required-environments = []
+sources = { }
+
+[tool.uv.dependency-groups]
+#:null:
+
+[tool.uv.build-backend]
+data = { }
+default-excludes = true
+module-name = 'app'
+module-root = 'backend'
+namespace = false
+source-exclude = []
+source-include = []
+wheel-exclude = []
+
+[tool.uv.workspace]
+exclude = []
+members = []

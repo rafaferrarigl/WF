@@ -1,0 +1,21 @@
+project-includes = ['backend']
+project-excludes = []
+use-ignore-files = true
+search-path = ['.']
+disable-search-path-heuristics = false
+site-package-path = []
+
+python-platform = 'linux'
+python-version = '3.12'
+#:null: python-interpreter-path = ''
+
+replace-imports-with-any = []
+ignore-missing-imports = []
+ignore-errors-in-generated-code = false
+ignore-missing-source = false
+untyped-def-behavior = 'check-and-infer-return-type'
+permissive-ignores = false
+
+
+[errors]
+#:null:

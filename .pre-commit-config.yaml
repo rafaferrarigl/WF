@@ -1,0 +1,44 @@
+minimum_pre_commit_version: 4.3.0
+
+fail_fast: false
+files: ''
+exclude: ^$
+
+default_install_hook_types:
+  - pre-commit
+
+default_language_version:
+  python: python3.12
+
+repos:
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.5
+    hooks:
+      - id: uv-lock
+        name: uv lock
+      - id: uv-export
+        name: uv export
+      # - id: pip-compile
+      #   name: pip-compile requirements.in
+      #   args: [ requirements.in, -o, requirements.txt ]
+      # - id: pip-compile
+      #   name: pip-compile requirements-dev.in
+      #   args: [ requirements-dev.in, -o, requirements-dev.txt ]
+      #   files: ^requirements-dev\.(in|txt)$
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.2
+    hooks:
+      - id: ruff-check
+        name: Ruff check
+        args: [ --fix ]
+      - id: ruff-format
+        name: Ruff format
+
+  - repo: https://github.com/facebook/pyrefly-pre-commit
+    rev: 0.0.1
+    hooks:
+      - id: pyrefly-typecheck-specific-version
+        name: Pyrefly
+        pass_filenames: false
+        additional_dependencies: [ pyrefly~=0.38.2 ]

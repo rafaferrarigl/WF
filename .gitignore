@@ -1,4 +1,17 @@
-**/.vscode/
-**/.idea/
+# IDEs
+.idea/
+.vscode/
 
+# uv
+.uv_cache/
+uv.lock
+
+# virtual env
+venv/
+.venv/
+
+# python
 **/__pycache__/
+
+# packing
+dist/

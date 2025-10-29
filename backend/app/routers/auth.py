@@ -1,45 +1,35 @@
+from __future__ import annotations
+
 import os
-
-from datetime import date, datetime, timedelta
-
+from datetime import UTC, date, datetime, timedelta
 from typing import Annotated
 
-from app.database import SessionLocal
-
-from app.models.user import User
-
 from dotenv import load_dotenv
-
 from fastapi import APIRouter, Depends, HTTPException
-
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-
 from jose import JWTError, jwt
-
 from passlib.context import CryptContext
-
 from pydantic import BaseModel
-
 from sqlalchemy.orm import Session
-
 from starlette import status
 
-
+from app.database import SessionLocal
+from app.models.user import User
 
 # -------------------------------------------------------------------
 # 🔧 Configuración básica
 # -------------------------------------------------------------------
 router = APIRouter(
-    prefix="/auth",
-    tags=["auth"],
+    prefix='/auth',
+    tags=['auth'],
 )
 
 load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
+SECRET_KEY = os.getenv('SECRET_KEY')
+ALGORITHM = os.getenv('ALGORITHM')
 
-bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/login")
+bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
 
 
 # -------------------------------------------------------------------
@@ -49,11 +39,12 @@ class CreateUserRequest(BaseModel):
     username: str
     email: str
     password: str
-    is_admin: bool = False  # 👈 (por defecto False)
+    is_admin: bool = False
     birth_date: date | None = None
     height: float | None = None
     weight: float | None = None
     gender: str | None = None
+
 
 class Token(BaseModel):
     access_token: str
@@ -77,20 +68,20 @@ db_dependency = Annotated[Session, Depends(get_db)]
 # -------------------------------------------------------------------
 # 👤 Crear nuevo usuario
 # -------------------------------------------------------------------
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     existing_user = (
         db.query(User)
         .filter(
             (User.username == create_user_request.username)
-            | (User.email == create_user_request.email)
+            | (User.email == create_user_request.email),
         )
         .first()
     )
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username or email already registered.",
+            detail='Username or email already registered.',
         )
     create_user_model = User(
         username=create_user_request.username,
@@ -107,33 +98,31 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.commit()
     db.refresh(create_user_model)
 
-    return {"message": f"User '{create_user_model.username}' created successfully."}
-
+    return {'message': f"User '{create_user_model.username}' created successfully."}
 
 
 # -------------------------------------------------------------------
 # 🔐 Login
 # -------------------------------------------------------------------
-@router.post("/login", response_model=Token)
+@router.post('/login', response_model=Token)
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency,
 ):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail='Incorrect username or password',
+            headers={'WWW-Authenticate': 'Bearer'},
         )
     token = create_access_token(
-        username=user.username,
-        user_id=user.id,
-        is_admin=user.is_admin,
+        username=user.username,  # type: ignore[bad-argument-type]
+        user_id=user.id,  # type: ignore[bad-argument-type]
+        is_admin=user.is_admin,  # type: ignore[bad-argument-type]
         expires_delta=timedelta(minutes=30),
     )
 
-    return {"access_token": token, "token_type": "bearer"}
-
+    return {'access_token': token, 'token_type': 'bearer'}
 
 
 # -------------------------------------------------------------------
@@ -149,9 +138,9 @@ def authenticate_user(username: str, password: str, db: Session):
 
 
 def create_access_token(username: str, user_id: int, is_admin: bool, expires_delta: timedelta):
-    encode = {"sub": username, "id": user_id, "is_admin": is_admin}
-    expire = datetime.utcnow() + expires_delta
-    encode.update({"exp": expire})
+    encode = {'sub': username, 'id': user_id, 'is_admin': is_admin}
+    expire = datetime.now(UTC) + expires_delta
+    encode.update({'exp': expire.isoformat()})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
@@ -161,32 +150,32 @@ def create_access_token(username: str, user_id: int, is_admin: bool, expires_del
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        user_id: int = payload.get("id")
-        is_admin: bool = payload.get("is_admin")
-        expire_date = payload.get("exp")
-
-        if datetime.utcnow() > datetime.utcfromtimestamp(expire_date):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token has expired",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+        username = payload.get('sub')
+        user_id = payload.get('id')
+        is_admin = payload.get('is_admin')
+        expire_date= payload.get('exp', datetime.now(UTC).isoformat())
 
         if username is None or user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate credentials",
-                headers={"WWW-Authenticate": "Bearer"},
+                detail='Could not validate credentials',
+                headers={'WWW-Authenticate': 'Bearer'},
             )
 
-        return {"username": username, "id": user_id, "is_admin": is_admin}
+        if datetime.now(UTC) > datetime.fromisoformat(expire_date):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Token has expired',
+                headers={'WWW-Authenticate': 'Bearer'},
+            )
+
+        return {'username': username, 'id': user_id, 'is_admin': is_admin}
 
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail='Could not validate credentials',
+            headers={'WWW-Authenticate': 'Bearer'},
         )
 
 
@@ -194,9 +183,9 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
 # 🛡️ Dependencia para rutas protegidas solo para admins
 # -------------------------------------------------------------------
 def admin_required(current_user: dict = Depends(get_current_user)):
-    if not current_user["is_admin"]:
+    if not current_user['is_admin']:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to perform this action.",
+            detail='You do not have permission to perform this action.',
         )
     return current_user

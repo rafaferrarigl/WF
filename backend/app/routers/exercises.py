@@ -1,12 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session, joinedload
+from __future__ import annotations
+
 from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
 from app.database import SessionLocal
 from app.models.exercise import Exercise
 from app.routers.auth import get_current_user
-from pydantic import BaseModel
 
-router = APIRouter(prefix="/exercises", tags=["routines"])
+
+router = APIRouter(prefix='/exercises', tags=['routines'])
 
 # ---------------------- 🔧 Dependencia DB ----------------------
 def get_db():
@@ -39,20 +44,20 @@ class ExerciseResponse(BaseModel):
 
 
 # ---------------------- 🏋️ Crear ejercicio ----------------------
-@router.post("/", response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED)
+@router.post('/', response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED)
 async def create_exercise(
     exercise: ExerciseCreate,
     db: db_dependency,
-    current_user=Depends(get_current_user)
+    current_user=Depends(get_current_user),
 ):
-    if not current_user["is_admin"]:
-        raise HTTPException(status_code=403, detail="Solo entrenadores pueden crear ejercicios")
-    
+    if not current_user['is_admin']:
+        raise HTTPException(status_code=403, detail='Solo entrenadores pueden crear ejercicios')
+
     new_exercise = Exercise(
         name=exercise.name,
         description=exercise.description,
         video_url=exercise.video_url,
-        comment=exercise.comment
+        comment=exercise.comment,
     )
     db.add(new_exercise)
     db.commit()
