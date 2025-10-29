@@ -16,6 +16,7 @@ from starlette import status
 from app.database import SessionLocal
 from app.models.user import User
 
+
 # -------------------------------------------------------------------
 # 🔧 Configuración básica
 # -------------------------------------------------------------------
@@ -73,8 +74,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     existing_user = (
         db.query(User)
         .filter(
-            (User.username == create_user_request.username)
-            | (User.email == create_user_request.email),
+            (User.username == create_user_request.username) | (User.email == create_user_request.email),
         )
         .first()
     )
@@ -106,7 +106,8 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
 # -------------------------------------------------------------------
 @router.post('/login', response_model=Token)
 async def login_for_access_token(
-        form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency,
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: db_dependency,
 ):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
@@ -153,7 +154,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         username = payload.get('sub')
         user_id = payload.get('id')
         is_admin = payload.get('is_admin')
-        expire_date= payload.get('exp', datetime.now(UTC).isoformat())
+        expire_date = payload.get('exp', datetime.now(UTC).isoformat())
 
         if username is None or user_id is None:
             raise HTTPException(
@@ -179,10 +180,11 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         )
 
 
-# -------------------------------------------------------------------
-# 🛡️ Dependencia para rutas protegidas solo para admins
-# -------------------------------------------------------------------
 def admin_required(current_user: dict = Depends(get_current_user)):
+    """Dependencia para rutas que requieren permisos de administrador.
+    :param current_user:
+    :return:
+    """
     if not current_user['is_admin']:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
