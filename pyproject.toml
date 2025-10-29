@@ -9,6 +9,7 @@ dependencies = [
     "python-jose>=3.5.0",
     "uvicorn>=0.38.0",
     "python-multipart>=0.0.20,<0.0.21",
+    "psycopg2-binary>=2.9.11,<2.10.0",
 ]
 optional-dependencies = { }
 
