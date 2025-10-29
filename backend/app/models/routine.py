@@ -4,7 +4,6 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.exercise import Exercise
 from app.models.user import User
 
 
@@ -18,4 +17,4 @@ class Routine(Base):
     trainer_id = Column(Integer, ForeignKey(User.id.expression))  # el entrenador que la creó
     client_id = Column(Integer, ForeignKey(User.id.expression))  # el cliente asignado
 
-    exercises = relationship(Exercise.__name__, back_populates='routine')
+    exercises = relationship('Exercise', back_populates='routine')

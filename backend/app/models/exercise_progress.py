@@ -17,4 +17,4 @@ class ExerciseProgress(Base):
     weight = Column(Float, nullable=True)
     repetitions = Column(Integer, nullable=True)
 
-    exercise = relationship(Exercise.__name__, back_populates='progress')
+    exercise = relationship('Exercise', back_populates='progress')

@@ -4,7 +4,6 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
-from app.models.exercise_progress import ExerciseProgress
 from app.models.routine import Routine
 
 
@@ -19,6 +18,6 @@ class Exercise(Base):
     comment = Column(Text, nullable=True)
 
     # Relación con el progreso del cliente (peso y repeticiones)
-    progress = relationship(ExerciseProgress.__name__, back_populates='exercise')
+    progress = relationship('ExerciseProgress', back_populates='exercise')
 
-    routine = relationship(Routine.__name__, back_populates='exercises')
+    routine = relationship('Routine', back_populates='exercises')

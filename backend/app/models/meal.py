@@ -5,7 +5,6 @@ from sqlalchemy.orm import relationship
 
 from app.database import Base
 from app.models.diet import Diet
-from app.models.food import Food
 
 
 class Meal(Base):
@@ -17,5 +16,5 @@ class Meal(Base):
     description = Column(String, nullable=True)  # 🆕 Nueva columna
     total_calories = Column(Float, default=0)
 
-    foods = relationship(Food.__name__, back_populates='meal')
-    diet = relationship(Diet.__name__, back_populates='meals')
+    foods = relationship('Food', back_populates='meal')
+    diet = relationship('Diet', back_populates='meals')

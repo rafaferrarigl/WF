@@ -18,4 +18,4 @@ class Food(Base):
     fats = Column(Float, default=0)
     grams = Column(Float, default=0)
 
-    meal = relationship(Meal.__name__, back_populates='foods')
+    meal = relationship('Meal', back_populates='foods')
