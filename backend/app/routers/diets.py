@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import joinedload
 
-from app.database import db_dependency
+from app.database import db_dependency  # noqa: TC001
 from app.models.diet import Diet
 from app.models.meal import Meal
 from app.models.user import User

@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from starlette import status
 
-from app.database import db_dependency
+from app.database import db_dependency  # noqa: TC001
 from app.models.user import User
 
 

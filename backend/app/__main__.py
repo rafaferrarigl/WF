@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.database import Base, set_db
 from app.routers import auth, diets, exercises, food, meal, routines
-from app.routers.auth import user_dependency
+from app.routers.auth import user_dependency  # noqa: TC001
 from app.routers.routines import RoutineResponse
 
 

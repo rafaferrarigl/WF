@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
-from app.database import db_dependency
+from app.database import db_dependency  # noqa: TC001
 from app.models.exercise import Exercise
 from app.routers.auth import get_current_user
 

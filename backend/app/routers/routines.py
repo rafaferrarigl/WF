@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime  # noqa: TC003
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
-from app.database import db_dependency
+from app.database import db_dependency  # noqa: TC001
 from app.models.exercise import Exercise
 from app.models.routine import Routine
 from app.models.user import User
 from app.routers.auth import get_current_user
-from app.routers.exercises import ExerciseResponse
+from app.routers.exercises import ExerciseResponse  # noqa: TC001
 
 
 router = APIRouter(
