@@ -4,7 +4,6 @@ import os
 from datetime import UTC, date, datetime, timedelta
 from typing import TYPE_CHECKING, Annotated
 
-from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -29,7 +28,6 @@ router = APIRouter(
     tags=['auth'],
 )
 
-load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = os.getenv('ALGORITHM')
 

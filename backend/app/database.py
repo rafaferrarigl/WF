@@ -3,13 +3,11 @@ from __future__ import annotations
 from os import environ
 from typing import Annotated
 
-from dotenv import load_dotenv
 from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 
-load_dotenv()
 SQLALCHEMY_DATABASE_URL: str = environ['DATABASE_URL']
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

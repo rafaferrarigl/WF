@@ -5,7 +5,6 @@ requires-python = '>=3.12'
 dependencies = [
     'sqlalchemy~=2.0.44',
     'fastapi~=0.120.2',
-    "dotenv>=0.9.9",
     "passlib>=1.7.4",
     "python-jose>=3.5.0",
     "uvicorn>=0.38.0",
