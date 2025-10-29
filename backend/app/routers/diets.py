@@ -16,7 +16,6 @@ from app.routers.auth import get_current_user
 if TYPE_CHECKING:
     from app.database import db_dependency
 
-
 router = APIRouter(
     prefix='/diets',
     tags=['diets'],

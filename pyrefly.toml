@@ -1,4 +1,4 @@
-project-includes = ['backend']
+project-includes = ['backend/**/*.py']
 project-excludes = []
 use-ignore-files = true
 search-path = [
