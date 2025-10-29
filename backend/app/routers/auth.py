@@ -170,6 +170,9 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         )
 
 
+user_dependency = Annotated[dict, Depends(get_current_user)]
+
+
 def admin_required(current_user: dict = Depends(get_current_user)):
     """Dependencia para rutas que requieren permisos de administrador.
     :param current_user:

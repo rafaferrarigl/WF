@@ -9,6 +9,7 @@ dependencies = [
     "passlib>=1.7.4",
     "python-jose>=3.5.0",
     "uvicorn>=0.38.0",
+    "python-multipart>=0.0.20,<0.0.21",
 ]
 optional-dependencies = { }
 

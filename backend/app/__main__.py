@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from typing import Annotated
+from typing import TYPE_CHECKING
 
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 
-from app.database import Base, SessionLocal, engine
+from app.database import Base, engine
 from app.routers import auth, diets, exercises, food, meal, routines
-from app.routers.auth import get_current_user
+
+
+if TYPE_CHECKING:
+    from app.routers.auth import user_dependency
 
 
 app = FastAPI()
@@ -29,18 +31,6 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-db_dependency = Annotated[Session, Depends(get_db)]
-user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
 @app.get('/auth/me', tags=['auth'])
