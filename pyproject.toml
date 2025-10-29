@@ -8,6 +8,7 @@ dependencies = [
     "dotenv>=0.9.9",
     "passlib>=1.7.4",
     "python-jose>=3.5.0",
+    "uvicorn>=0.38.0",
 ]
 optional-dependencies = { }
 

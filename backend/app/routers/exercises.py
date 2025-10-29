@@ -13,6 +13,7 @@ from app.routers.auth import get_current_user
 
 router = APIRouter(prefix='/exercises', tags=['routines'])
 
+
 # ---------------------- 🔧 Dependencia DB ----------------------
 def get_db():
     db = SessionLocal()
@@ -20,6 +21,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 db_dependency = Annotated[Session, Depends(get_db)]
 

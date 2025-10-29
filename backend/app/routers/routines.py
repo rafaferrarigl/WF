@@ -10,7 +10,7 @@ from app.database import SessionLocal
 from app.models.exercise import Exercise
 from app.models.routine import Routine
 from app.models.user import User
-from app.routers.auth import get_current_user  # ✅ solo usamos esta
+from app.routers.auth import get_current_user
 
 
 if TYPE_CHECKING:
@@ -24,6 +24,7 @@ router = APIRouter(
     tags=['routines'],
 )
 
+
 # ---------------------- 🔧 Dependencia DB ----------------------
 def get_db():
     db = SessionLocal()
@@ -31,6 +32,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
@@ -43,6 +45,7 @@ class RoutineCreate(BaseModel):
     client_id: int
     exercise_ids: list[int] = []
 
+
 class RoutineResponse(BaseModel):
     id: int
     name: str
@@ -54,8 +57,6 @@ class RoutineResponse(BaseModel):
 
     class Config:
         orm_mode = True
-
-
 
 
 # ---------------------- 👨‍🏫 Crear rutina (solo entrenadores) ----------------------
@@ -128,9 +129,7 @@ async def get_routine(
         raise HTTPException(status_code=404, detail='Rutina no encontrada.')
 
     # ⚖️ Permitir acceso solo al entrenador o al cliente asignado
-    if not (
-        current_user['is_admin'] and routine.trainer_id == current_user['id']
-    ) and not (
+    if not (current_user['is_admin'] and routine.trainer_id == current_user['id']) and not (
         not current_user['is_admin'] and routine.client_id == current_user['id']
     ):
         raise HTTPException(status_code=403, detail='No tienes permiso para ver esta rutina.')

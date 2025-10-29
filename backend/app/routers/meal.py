@@ -13,6 +13,7 @@ from app.routers.auth import get_current_user
 
 router = APIRouter(prefix='/meals', tags=['diets'])
 
+
 # ---------------------- 🔧 Dependencia DB ----------------------
 def get_db():
     db = SessionLocal()
@@ -20,6 +21,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
@@ -29,6 +31,7 @@ class MealCreate(BaseModel):
     name: str
     description: str | None = None
     total_calories: float | None = 0
+
 
 class FoodResponse(BaseModel):
     id: int
@@ -64,9 +67,9 @@ async def create_meal(
         raise HTTPException(status_code=403, detail='Solo entrenadores pueden crear comidas.')
 
     new_meal = Meal(
-    name=meal.name,
-    description=meal.description,
-    total_calories=meal.total_calories,
+        name=meal.name,
+        description=meal.description,
+        total_calories=meal.total_calories,
     )
     db.add(new_meal)
     db.commit()

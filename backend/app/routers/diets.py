@@ -19,6 +19,7 @@ router = APIRouter(
     tags=['diets'],
 )
 
+
 # ---------------------- 🔧 Dependencia DB ----------------------
 def get_db():
     db = SessionLocal()
@@ -27,9 +28,11 @@ def get_db():
     finally:
         db.close()
 
+
 db_dependency = Annotated[Session, Depends(get_db)]
 
 # ---------------------- 📦 Esquemas Pydantic ----------------------
+
 
 class FoodResponse(BaseModel):
     id: int
@@ -141,12 +144,7 @@ async def get_diet(
     db: db_dependency,
     current_user=Depends(get_current_user),
 ):
-    diet = (
-        db.query(Diet)
-        .options(joinedload(Diet.meals).joinedload(Meal.foods))
-        .filter(Diet.id == diet_id)
-        .first()
-    )
+    diet = db.query(Diet).options(joinedload(Diet.meals).joinedload(Meal.foods)).filter(Diet.id == diet_id).first()
     if not diet:
         raise HTTPException(status_code=404, detail='Dieta no encontrada.')
 
