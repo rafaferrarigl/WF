@@ -1,20 +1,17 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import joinedload
 
+from app.database import db_dependency
 from app.models.diet import Diet
 from app.models.meal import Meal
 from app.models.user import User
 from app.routers.auth import get_current_user
 
-
-if TYPE_CHECKING:
-    from app.database import db_dependency
 
 router = APIRouter(
     prefix='/diets',

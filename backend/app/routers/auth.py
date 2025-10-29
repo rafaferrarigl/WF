@@ -11,13 +11,12 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from starlette import status
 
+from app.database import db_dependency
 from app.models.user import User
 
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
-
-    from app.database import db_dependency
 
 
 # -------------------------------------------------------------------

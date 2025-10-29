@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from os import environ
-from typing import TYPE_CHECKING
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
@@ -11,10 +10,9 @@ from sqlalchemy.orm import sessionmaker
 
 from app.database import Base, set_db
 from app.routers import auth, diets, exercises, food, meal, routines
+from app.routers.auth import user_dependency
+from app.routers.routines import RoutineResponse
 
-
-if TYPE_CHECKING:
-    from app.routers.auth import user_dependency
 
 app = FastAPI()
 app.include_router(auth.router)
@@ -47,6 +45,8 @@ def main() -> None:
     set_db(sm)
     Base.metadata.create_all(bind=engine)
 
+    RoutineResponse.model_rebuild()
+    app.openapi()
     uvicorn.run(app, host='localhost', port=8000)
 
 

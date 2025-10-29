@@ -194,7 +194,7 @@ banned-module-level-imports = []
 
 
 [lint.flake8-type-checking]
-exempt-modules = ['typing', 'typing_extensions']
+exempt-modules = ['typing', 'typing_extensions', 'app']
 quote-annotations = false
 runtime-evaluated-base-classes = []
 runtime-evaluated-decorators = []

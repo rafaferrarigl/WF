@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
+from app.database import db_dependency
 from app.models.meal import Meal
 from app.routers.auth import get_current_user
-
-
-if TYPE_CHECKING:
-    from app.database import db_dependency
 
 
 router = APIRouter(prefix='/meals', tags=['diets'])
