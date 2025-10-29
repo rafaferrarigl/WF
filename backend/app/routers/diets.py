@@ -33,18 +33,12 @@ class FoodResponse(BaseModel):
     carbs: float
     fats: float
 
-    class Config:
-        orm_mode = True
-
 
 class MealResponse(BaseModel):
     id: int
     name: str
     total_calories: float
     foods: list[FoodResponse] = []
-
-    class Config:
-        orm_mode = True
 
 
 class DietResponse(BaseModel):
@@ -54,9 +48,6 @@ class DietResponse(BaseModel):
     client_id: int
     created_at: datetime
     meals: list[MealResponse] = []
-
-    class Config:
-        orm_mode = True
 
 
 class DietCreate(BaseModel):

@@ -31,9 +31,6 @@ class ExerciseResponse(BaseModel):
     video_url: str | None
     comment: str | None
 
-    class Config:
-        orm_mode = True
-
 
 # ---------------------- 🏋️ Crear ejercicio ----------------------
 @router.post('/', response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED)

@@ -34,9 +34,6 @@ class FoodResponse(BaseModel):
     carbs: float
     fats: float
 
-    class Config:
-        orm_mode = True
-
 
 # ---------------------- 🧑‍🍳 Agregar alimento a una comida ----------------------
 @router.post('/meal/{meal_id}', response_model=FoodResponse, status_code=status.HTTP_201_CREATED)

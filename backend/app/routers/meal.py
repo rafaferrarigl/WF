@@ -31,9 +31,6 @@ class FoodResponse(BaseModel):
     carbs: float
     fats: float
 
-    class Config:
-        orm_mode = True
-
 
 class MealResponse(BaseModel):
     id: int
@@ -41,9 +38,6 @@ class MealResponse(BaseModel):
     description: str | None = None
     total_calories: float
     foods: list[FoodResponse] = []
-
-    class Config:
-        orm_mode = True
 
 
 # ---------------------- 👨‍🏫 Crear comida (solo entrenadores) ----------------------

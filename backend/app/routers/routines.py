@@ -46,9 +46,6 @@ class RoutineResponse(BaseModel):
     client_id: int
     exercises: list[ExerciseResponse] = []
 
-    class Config:
-        orm_mode = True
-
 
 # ---------------------- 👨‍🏫 Crear rutina (solo entrenadores) ----------------------
 @router.post('/', response_model=RoutineResponse, status_code=status.HTTP_201_CREATED)
