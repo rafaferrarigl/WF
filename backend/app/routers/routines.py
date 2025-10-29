@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 
-from app.database import SessionLocal
 from app.models.exercise import Exercise
 from app.models.routine import Routine
 from app.models.user import User
@@ -16,6 +14,7 @@ from app.routers.auth import get_current_user
 if TYPE_CHECKING:
     from datetime import datetime
 
+    from app.database import db_dependency
     from app.routers.exercises import ExerciseResponse
 
 
@@ -26,15 +25,7 @@ router = APIRouter(
 
 
 # ---------------------- 🔧 Dependencia DB ----------------------
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
-
-db_dependency = Annotated[Session, Depends(get_db)]
 
 # ---------------------- 📦 Esquemas Pydantic ----------------------
 

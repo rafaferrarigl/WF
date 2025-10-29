@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from datetime import UTC, date, datetime, timedelta
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException
@@ -10,11 +10,15 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 from starlette import status
 
-from app.database import SessionLocal
 from app.models.user import User
+
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+    from app.database import db_dependency
 
 
 # -------------------------------------------------------------------
@@ -50,20 +54,6 @@ class CreateUserRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
-
-
-# -------------------------------------------------------------------
-# 🗄️ Dependencia de DB
-# -------------------------------------------------------------------
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-db_dependency = Annotated[Session, Depends(get_db)]
 
 
 # -------------------------------------------------------------------
