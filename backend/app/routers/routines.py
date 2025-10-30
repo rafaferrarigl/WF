@@ -88,21 +88,3 @@ async def get_all_routines(
     query = db.query(Routine).filter(filter_element == current_user.user_id)
 
     return query.all()
-
-
-# ---------------------- 🔎 Ver una rutina específica ----------------------
-@router.get('/{routine_id}', response_model=RoutineResponse)
-async def get_routine(
-    routine_id: int,
-    db: DBSession,
-    current_user: AutoUser,
-):
-    routine = db.query(Routine).filter(Routine.id == routine_id).first()
-    if not routine:
-        raise HTTPException(status_code=404, detail='Rutina no encontrada.')
-
-    # ⚖️ Permitir acceso solo al entrenador o al cliente asignado
-    if not (current_user.is_admin or routine.client_id == current_user.user_id):
-        raise HTTPException(status_code=403, detail='No tienes permiso para ver esta rutina.')
-
-    return routine
