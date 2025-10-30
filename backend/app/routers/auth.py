@@ -75,7 +75,7 @@ class JwtTokenData(BaseModel):
 # 👤 Crear nuevo usuario
 # -------------------------------------------------------------------
 @router.post('/', status_code=status.HTTP_201_CREATED)
-async def create_user(db: DBSession, create_user_request: CreateUserRequest):
+async def create_user(db: DBSession, create_user_request: CreateUserRequest) -> None:
     existing_user = (
         db.query(User)
         .filter(
@@ -103,8 +103,6 @@ async def create_user(db: DBSession, create_user_request: CreateUserRequest):
     db.commit()
     db.refresh(create_user_model)
 
-    return {'message': f"User '{create_user_model.username}' created successfully."}
-
 
 # -------------------------------------------------------------------
 # 🔐 Login
@@ -113,7 +111,7 @@ async def create_user(db: DBSession, create_user_request: CreateUserRequest):
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: DBSession,
-):
+) -> Token:
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
@@ -138,7 +136,7 @@ async def login_for_access_token(
 # -------------------------------------------------------------------
 # 🔑 Funciones auxiliares
 # -------------------------------------------------------------------
-def authenticate_user(username: str, password: str, db: Session):
+def authenticate_user(username: str, password: str, db: Session) -> User | None:
     user = db.query(User).filter(User.username == username).first()
     if not user or not bcrypt_context.verify(password, user.hashed_password):
         return None
@@ -146,14 +144,14 @@ def authenticate_user(username: str, password: str, db: Session):
     return user
 
 
-def create_access_token(jwt_data: JwtTokenData):
+def create_access_token(jwt_data: JwtTokenData) -> str:
     return jwt.encode(jwt_data.model_dump(), SECRET_KEY, algorithm=ALGORITHM)
 
 
 # -------------------------------------------------------------------
 # 🧠 Obtener usuario actual desde el token
 # -------------------------------------------------------------------
-async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]) -> AuthUser:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
@@ -185,7 +183,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     return AuthUser(username=username, user_id=user_id, is_admin=is_admin)
 
 
-async def assert_admin_user(token: Annotated[str, Depends(oauth2_bearer)]):
+async def assert_admin_user(token: Annotated[str, Depends(oauth2_bearer)]) -> AuthUser:
     user = await get_current_user(token)
     if not user.is_admin:
         raise HTTPException(

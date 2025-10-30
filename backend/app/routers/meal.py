@@ -36,12 +36,12 @@ class MealResponse(BaseModel):
 
 
 # ---------------------- 👨‍🏫 Crear comida (solo entrenadores) ----------------------
-@router.post('/', response_model=MealResponse, status_code=status.HTTP_201_CREATED)
+@router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_meal(
     meal: MealCreate,
     db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
-):
+) -> MealResponse:
     new_meal = Meal(
         name=meal.name,
         description=meal.description,
@@ -54,21 +54,21 @@ async def create_meal(
 
 
 # ---------------------- 🍴 Ver todas las comidas ----------------------
-@router.get('/', response_model=list[MealResponse])
+@router.get('/')
 async def get_all_meals(
     db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
-):
+) -> list[MealResponse]:
     return db.query(Meal).all()
 
 
 # ---------------------- 🔎 Ver una comida específica ----------------------
-@router.get('/{meal_id}', response_model=MealResponse)
+@router.get('/{meal_id}')
 async def get_meal(
     meal_id: int,
     db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
-):
+) -> MealResponse:
     meal = db.query(Meal).filter(Meal.id == meal_id).first()
     if not meal:
         raise HTTPException(status_code=404, detail='Comida no encontrada.')

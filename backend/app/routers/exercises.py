@@ -43,12 +43,12 @@ class ExerciseResponse(BaseModel):
 
 
 # ---------------------- 🏋️ Crear ejercicio ----------------------
-@router.post('/', response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED)
+@router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_exercise(
     exercise: ExerciseCreate,
     db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
-):
+) -> ExerciseResponse:
     new_exercise = Exercise(
         name=exercise.name,
         description=exercise.description,

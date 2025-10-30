@@ -54,12 +54,12 @@ class DietCreate(BaseModel):
 
 
 # ---------------------- 👨‍🏫 Crear dieta (solo entrenadores) ----------------------
-@router.post('/', response_model=DietResponse, status_code=status.HTTP_201_CREATED)
+@router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_diet(
     diet_request: DietCreate,
     db: DBSession,
     current_user: AutoAdminUser,
-):
+) -> DietResponse:
     # Verificar que el cliente exista
     client = db.query(User).filter(User.id == diet_request.client_id).first()
     if not client:
@@ -89,11 +89,11 @@ async def create_diet(
 
 
 # ---------------------- 👀 Ver todas las dietas ----------------------
-@router.get('/', response_model=list[DietResponse])
+@router.get('/')
 async def get_all_diets(
     db: DBSession,
     current_user: AutoUser,
-):
+) -> list[DietResponse]:
     filter_element = Diet.trainer_id if current_user.is_admin else Diet.client_id
     query = (
         db.query(Diet)
@@ -105,12 +105,12 @@ async def get_all_diets(
 
 
 # ---------------------- 🔎 Ver una dieta específica ----------------------
-@router.get('/{diet_id}', response_model=DietResponse)
+@router.get('/{diet_id}')
 async def get_diet(
     diet_id: int,
     db: DBSession,
     current_user: AutoUser,
-):
+) -> DietResponse:
     diet = db.query(Diet).options(joinedload(Diet.meals).joinedload(Meal.foods)).filter(Diet.id == diet_id).first()
     if not diet:
         raise HTTPException(status_code=404, detail='Dieta no encontrada.')

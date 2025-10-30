@@ -31,13 +31,13 @@ class FoodResponse(BaseModel):
 
 
 # ---------------------- 🧑‍🍳 Agregar alimento a una comida ----------------------
-@router.post('/meal/{meal_id}', response_model=FoodResponse, status_code=status.HTTP_201_CREATED)
+@router.post('/meal/{meal_id}', status_code=status.HTTP_201_CREATED)
 async def add_food_to_meal(
     meal_id: int,
     food: FoodCreate,
     db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
-):
+) -> FoodResponse:
     # Solo entrenadores pueden agregar alimentos
     meal = db.query(Meal).filter(Meal.id == meal_id).first()
     if not meal:
@@ -58,10 +58,10 @@ async def add_food_to_meal(
 
 
 # ---------------------- 👀 Ver alimentos de una comida ----------------------
-@router.get('/meal/{meal_id}', response_model=list[FoodResponse])
+@router.get('/meal/{meal_id}')
 async def get_foods_by_meal(
     meal_id: int,
     db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
-):
+) -> list[FoodResponse]:
     return db.query(Food).filter(Food.meal_id == meal_id).all()

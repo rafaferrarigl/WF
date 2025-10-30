@@ -29,7 +29,7 @@ app.add_middleware(
 
 
 @app.get('/auth/me', tags=['auth'])
-async def get_me(user: AutoUser):
+async def get_me(user: AutoUser) -> AutoUser:
     return user
 
 

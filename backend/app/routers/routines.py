@@ -43,12 +43,12 @@ class RoutineResponse(BaseModel):
 
 
 # ---------------------- 👨‍🏫 Crear rutina (solo entrenadores) ----------------------
-@router.post('/', response_model=RoutineResponse, status_code=status.HTTP_201_CREATED)
+@router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_routine(
     routine_request: RoutineCreate,
     db: DBSession,
     current_user: AutoAdminUser,
-):
+) -> RoutineResponse:
     # ✅ Verificar que el cliente exista
     client = db.query(User).filter(User.id == routine_request.client_id).first()
     if not client:
@@ -78,11 +78,11 @@ async def create_routine(
 
 
 # ---------------------- 👀 Ver todas las rutinas ----------------------
-@router.get('/', response_model=list[RoutineResponse])
+@router.get('/')
 async def get_all_routines(
     db: DBSession,
     current_user: AutoUser,
-):
+) -> list[RoutineResponse]:
     filter_element = Routine.trainer_id if current_user.is_admin else Routine.client_id
     # 🧠 Entrenadores ven sus rutinas creadas
     query = db.query(Routine).filter(filter_element == current_user.user_id)
