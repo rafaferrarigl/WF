@@ -3,7 +3,7 @@ from __future__ import annotations
 from os import environ
 
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Database
@@ -30,8 +30,6 @@ app.add_middleware(
 
 @app.get('/auth/me', tags=['auth'])
 async def get_me(user: AutoUser):
-    if user is None:
-        raise HTTPException(status_code=404, detail='User not found')
     return user
 
 

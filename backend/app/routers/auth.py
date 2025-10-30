@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from datetime import UTC, date, datetime, timedelta
+from enum import StrEnum
 from typing import TYPE_CHECKING, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -28,6 +29,7 @@ router = APIRouter(
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = os.getenv('ALGORITHM')
+TOKEN_EXPIRE_TIME = timedelta(minutes=30)
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
@@ -53,9 +55,20 @@ class CreateUserRequest(BaseModel):
     gender: str | None = None
 
 
+class TokenType(StrEnum):
+    BEARER = 'bearer'
+
+
 class Token(BaseModel):
     access_token: str
-    token_type: str
+    token_type: TokenType = TokenType.BEARER
+
+
+class JwtTokenData(BaseModel):
+    sub: str
+    user_id: int
+    is_admin: bool
+    exp: float
 
 
 # -------------------------------------------------------------------
@@ -108,14 +121,18 @@ async def login_for_access_token(
             detail='Incorrect username or password',
             headers={'WWW-Authenticate': 'Bearer'},
         )
-    token = create_access_token(
-        username=user.username,  # type: ignore[bad-argument-type]
-        user_id=user.id,  # type: ignore[bad-argument-type]
-        is_admin=user.is_admin,  # type: ignore[bad-argument-type]
-        expires_delta=timedelta(minutes=30),
+
+    expire = datetime.now(UTC) + TOKEN_EXPIRE_TIME
+    jwt_data = JwtTokenData(
+        sub=user.username,
+        user_id=user.id,
+        is_admin=user.is_admin,
+        exp=expire.timestamp(),
     )
 
-    return Token(access_token=token, token_type='bearer')
+    token = create_access_token(jwt_data)
+
+    return Token(access_token=token)
 
 
 # -------------------------------------------------------------------
@@ -123,18 +140,14 @@ async def login_for_access_token(
 # -------------------------------------------------------------------
 def authenticate_user(username: str, password: str, db: Session):
     user = db.query(User).filter(User.username == username).first()
-    if not user:
-        return False
-    if not bcrypt_context.verify(password, user.hashed_password):
-        return False
+    if not user or not bcrypt_context.verify(password, user.hashed_password):
+        return None
+
     return user
 
 
-def create_access_token(username: str, user_id: int, is_admin: bool, expires_delta: timedelta):
-    encode = {'sub': username, 'user_id': user_id, 'is_admin': is_admin}
-    expire = datetime.now(UTC) + expires_delta
-    encode.update({'exp': int(expire.timestamp())})
-    return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+def create_access_token(jwt_data: JwtTokenData):
+    return jwt.encode(jwt_data.model_dump(), SECRET_KEY, algorithm=ALGORITHM)
 
 
 # -------------------------------------------------------------------
