@@ -33,6 +33,12 @@ bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
 
 
+class AuthUser(BaseModel):
+    user_id: int
+    username: str
+    is_admin: bool
+
+
 # -------------------------------------------------------------------
 # 📦 Modelos Pydantic
 # -------------------------------------------------------------------
@@ -109,7 +115,7 @@ async def login_for_access_token(
         expires_delta=timedelta(minutes=30),
     )
 
-    return {'access_token': token, 'token_type': 'bearer'}
+    return Token(access_token=token, token_type='bearer')
 
 
 # -------------------------------------------------------------------
@@ -125,7 +131,7 @@ def authenticate_user(username: str, password: str, db: Session):
 
 
 def create_access_token(username: str, user_id: int, is_admin: bool, expires_delta: timedelta):
-    encode = {'sub': username, 'id': user_id, 'is_admin': is_admin}
+    encode = {'sub': username, 'user_id': user_id, 'is_admin': is_admin}
     expire = datetime.now(UTC) + expires_delta
     encode.update({'exp': int(expire.timestamp())})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -142,10 +148,10 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Could not validate credentials',
             headers={'WWW-Authenticate': 'Bearer'},
-        )
+        ) from None
 
     username = payload.get('sub')
-    user_id = payload.get('id')
+    user_id = payload.get('user_id')
     is_admin = payload.get('is_admin')
     expire_date = payload.get('exp', datetime.now(UTC).timestamp())
 
@@ -163,12 +169,12 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
             headers={'WWW-Authenticate': 'Bearer'},
         )
 
-    return {'username': username, 'id': user_id, 'is_admin': is_admin}
+    return AuthUser(username=username, user_id=user_id, is_admin=is_admin)
 
 
 async def assert_admin_user(token: Annotated[str, Depends(oauth2_bearer)]):
     user = await get_current_user(token)
-    if not user['is_admin']:
+    if not user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='You do not have permission to perform this action.',
@@ -177,5 +183,5 @@ async def assert_admin_user(token: Annotated[str, Depends(oauth2_bearer)]):
     return user
 
 
-AutoUser = Annotated[dict, Depends(get_current_user)]
-AutoAdminUser = Annotated[dict, Depends(assert_admin_user)]
+AutoUser = Annotated[AuthUser, Depends(get_current_user)]
+AutoAdminUser = Annotated[AuthUser, Depends(assert_admin_user)]

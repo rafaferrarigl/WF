@@ -67,7 +67,7 @@ async def create_diet(
 
     new_diet = Diet(
         name=diet_request.name,
-        trainer_id=current_user['id'],
+        trainer_id=current_user.user_id,
         client_id=diet_request.client_id,
         created_at=datetime.now(UTC),
     )
@@ -94,11 +94,11 @@ async def get_all_diets(
     db: DBSession,
     current_user: AutoUser,
 ):
-    filter_element = Diet.trainer_id if current_user['is_admin'] else Diet.client_id
+    filter_element = Diet.trainer_id if current_user.is_admin else Diet.client_id
     query = (
         db.query(Diet)
         .options(joinedload(Diet.meals).joinedload(Meal.foods))
-        .filter(filter_element == current_user['id'])
+        .filter(filter_element == current_user.user_id)
     )
 
     return query.all()
@@ -117,8 +117,8 @@ async def get_diet(
 
     # Solo el entrenador o el cliente asignado pueden verla
     if not (
-        (current_user['is_admin'] and diet.trainer_id == current_user['id'])
-        or (not current_user['is_admin'] and diet.client_id == current_user['id'])
+        (current_user.is_admin and diet.trainer_id == current_user.user_id)
+        or (not current_user.is_admin and diet.client_id == current_user.user_id)
     ):
         raise HTTPException(status_code=403, detail='No tienes permiso para ver esta dieta.')
 

@@ -58,7 +58,7 @@ async def create_routine(
     new_routine = Routine(
         name=routine_request.name,
         description=routine_request.description,
-        trainer_id=current_user['id'],
+        trainer_id=current_user.user_id,
         client_id=routine_request.client_id,
     )
     db.add(new_routine)
@@ -83,9 +83,9 @@ async def get_all_routines(
     db: DBSession,
     current_user: AutoUser,
 ):
-    filter_element = Routine.trainer_id if current_user['is_admin'] else Routine.client_id
+    filter_element = Routine.trainer_id if current_user.is_admin else Routine.client_id
     # 🧠 Entrenadores ven sus rutinas creadas
-    query = db.query(Routine).filter(filter_element == current_user['id'])
+    query = db.query(Routine).filter(filter_element == current_user.user_id)
 
     return query.all()
 
@@ -102,9 +102,7 @@ async def get_routine(
         raise HTTPException(status_code=404, detail='Rutina no encontrada.')
 
     # ⚖️ Permitir acceso solo al entrenador o al cliente asignado
-    if not (current_user['is_admin'] and routine.trainer_id == current_user['id']) and not (
-        not current_user['is_admin'] and routine.client_id == current_user['id']
-    ):
+    if not (current_user.is_admin or routine.client_id == current_user.user_id):
         raise HTTPException(status_code=403, detail='No tienes permiso para ver esta rutina.')
 
     return routine
