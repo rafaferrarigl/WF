@@ -137,33 +137,33 @@ def create_access_token(username: str, user_id: int, is_admin: bool, expires_del
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get('sub')
-        user_id = payload.get('id')
-        is_admin = payload.get('is_admin')
-        expire_date = payload.get('exp', datetime.now(UTC).timestamp())
-
-        if username is None or user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='Could not validate credentials',
-                headers={'WWW-Authenticate': 'Bearer'},
-            )
-
-        if datetime.now(UTC) > datetime.fromtimestamp(expire_date, UTC):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='Token has expired',
-                headers={'WWW-Authenticate': 'Bearer'},
-            )
-
-        return {'username': username, 'id': user_id, 'is_admin': is_admin}
-
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Could not validate credentials',
             headers={'WWW-Authenticate': 'Bearer'},
         )
+
+    username = payload.get('sub')
+    user_id = payload.get('id')
+    is_admin = payload.get('is_admin')
+    expire_date = payload.get('exp', datetime.now(UTC).timestamp())
+
+    if username is None or user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Could not validate credentials',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+
+    if datetime.now(UTC) > datetime.fromtimestamp(expire_date, UTC):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Token has expired',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+
+    return {'username': username, 'id': user_id, 'is_admin': is_admin}
 
 
 async def assert_admin_user(token: Annotated[str, Depends(oauth2_bearer)]):
