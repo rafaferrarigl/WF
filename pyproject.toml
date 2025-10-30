@@ -56,11 +56,17 @@ build-backend = 'uv_build'
 [dependency-groups]
 dev = [
     'pre-commit~=4.3.0',
+    'openapi-generator-cli~=7.17.0',
     { include-group = 'lint' },
-    { include-group = 'test' }
+    { include-group = 'test' },
+    { include-group = 'openapi-generator' },
 ]
 lint = ['ruff~=0.14.2', 'pyrefly~=0.39.1']
 test = ['pytest~=8.4.2']
+openapi-generator = [
+    'openapi-generator-cli~=7.17.0',
+    'jdk4py~=21.0.8',
+]
 
 
 [tool.uv]
