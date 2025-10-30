@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
-from app.database import db_dependency  # noqa: TC001
+from app.database import DBSession  # noqa: TC001
 from app.models.food import Food
 from app.models.meal import Meal
 from app.routers.auth import AutoAdminUser  # noqa: TC001
@@ -35,7 +35,7 @@ class FoodResponse(BaseModel):
 async def add_food_to_meal(
     meal_id: int,
     food: FoodCreate,
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
 ):
     # Solo entrenadores pueden agregar alimentos
@@ -61,7 +61,7 @@ async def add_food_to_meal(
 @router.get('/meal/{meal_id}', response_model=list[FoodResponse])
 async def get_foods_by_meal(
     meal_id: int,
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
 ):
     return db.query(Food).filter(Food.meal_id == meal_id).all()

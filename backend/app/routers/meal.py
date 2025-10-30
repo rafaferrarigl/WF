@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
-from app.database import db_dependency  # noqa: TC001
+from app.database import DBSession  # noqa: TC001
 from app.models.meal import Meal
 from app.routers.auth import AutoAdminUser  # noqa: TC001
 
@@ -39,7 +39,7 @@ class MealResponse(BaseModel):
 @router.post('/', response_model=MealResponse, status_code=status.HTTP_201_CREATED)
 async def create_meal(
     meal: MealCreate,
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
 ):
     new_meal = Meal(
@@ -56,7 +56,7 @@ async def create_meal(
 # ---------------------- 🍴 Ver todas las comidas ----------------------
 @router.get('/', response_model=list[MealResponse])
 async def get_all_meals(
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
 ):
     return db.query(Meal).all()
@@ -66,7 +66,7 @@ async def get_all_meals(
 @router.get('/{meal_id}', response_model=MealResponse)
 async def get_meal(
     meal_id: int,
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
 ):
     meal = db.query(Meal).filter(Meal.id == meal_id).first()

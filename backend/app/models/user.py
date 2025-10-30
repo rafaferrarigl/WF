@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from sqlalchemy import Boolean, Column, Date, Float, Integer, String
 
-from app.database import Base
+from app.database import Database
 
 
-class User(Base):
+class User(Database.base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)

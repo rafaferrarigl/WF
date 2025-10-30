@@ -5,10 +5,8 @@ from os import environ
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
-from app.database import Base, set_db
+from app.database import Database
 from app.routers import auth, diets, exercises, food, meal, routines
 from app.routers.auth import AutoUser  # noqa: TC001
 
@@ -38,11 +36,8 @@ async def get_me(user: AutoUser):
 
 
 def main() -> None:
-    engine = create_engine(environ['DATABASE_URL'])
-    sm = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-    set_db(sm)
-    Base.metadata.create_all(bind=engine)
+    db_url = environ['DATABASE_URL']
+    Database.init(db_url)
 
     uvicorn.run(app, host='localhost', port=8000)
 

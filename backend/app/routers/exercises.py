@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy import Column, Float, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
-from app.database import Base, db_dependency
+from app.database import DBSession, Database
 from app.models.exercise import Exercise
 from app.models.user import User
 from app.routers.auth import AutoAdminUser  # noqa: TC001
@@ -14,7 +14,7 @@ from app.routers.auth import AutoAdminUser  # noqa: TC001
 router = APIRouter(prefix='/exercises', tags=['routines'])
 
 
-class ExerciseProgress(Base):
+class ExerciseProgress(Database.base):
     __tablename__ = 'exercise_progress'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -46,7 +46,7 @@ class ExerciseResponse(BaseModel):
 @router.post('/', response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED)
 async def create_exercise(
     exercise: ExerciseCreate,
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoAdminUser,  # noqa: ARG001
 ):
     new_exercise = Exercise(

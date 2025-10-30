@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import joinedload
 
-from app.database import db_dependency  # noqa: TC001
+from app.database import DBSession  # noqa: TC001
 from app.models.diet import Diet
 from app.models.meal import Meal
 from app.models.user import User
@@ -57,7 +57,7 @@ class DietCreate(BaseModel):
 @router.post('/', response_model=DietResponse, status_code=status.HTTP_201_CREATED)
 async def create_diet(
     diet_request: DietCreate,
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoAdminUser,
 ):
     # Verificar que el cliente exista
@@ -91,7 +91,7 @@ async def create_diet(
 # ---------------------- 👀 Ver todas las dietas ----------------------
 @router.get('/', response_model=list[DietResponse])
 async def get_all_diets(
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoUser,
 ):
     filter_element = Diet.trainer_id if current_user['is_admin'] else Diet.client_id
@@ -108,7 +108,7 @@ async def get_all_diets(
 @router.get('/{diet_id}', response_model=DietResponse)
 async def get_diet(
     diet_id: int,
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoUser,
 ):
     diet = db.query(Diet).options(joinedload(Diet.meals).joinedload(Meal.foods)).filter(Diet.id == diet_id).first()

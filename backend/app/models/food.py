@@ -3,11 +3,11 @@ from __future__ import annotations
 from sqlalchemy import Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from app.database import Base
+from app.database import Database
 from app.models.meal import Meal
 
 
-class Food(Base):
+class Food(Database.base):
     __tablename__ = 'foods'
 
     id = Column(Integer, primary_key=True, index=True)

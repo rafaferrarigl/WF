@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from starlette import status
 
-from app.database import db_dependency  # noqa: TC001
+from app.database import DBSession  # noqa: TC001
 from app.models.user import User
 
 
@@ -56,7 +56,7 @@ class Token(BaseModel):
 # 👤 Crear nuevo usuario
 # -------------------------------------------------------------------
 @router.post('/', status_code=status.HTTP_201_CREATED)
-async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
+async def create_user(db: DBSession, create_user_request: CreateUserRequest):
     existing_user = (
         db.query(User)
         .filter(
@@ -93,7 +93,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
 @router.post('/login', response_model=Token)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: db_dependency,
+    db: DBSession,
 ):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:

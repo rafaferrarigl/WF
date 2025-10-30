@@ -5,7 +5,7 @@ from datetime import datetime  # noqa: TC003
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
-from app.database import db_dependency  # noqa: TC001
+from app.database import DBSession  # noqa: TC001
 from app.models.exercise import Exercise
 from app.models.routine import Routine
 from app.models.user import User
@@ -46,7 +46,7 @@ class RoutineResponse(BaseModel):
 @router.post('/', response_model=RoutineResponse, status_code=status.HTTP_201_CREATED)
 async def create_routine(
     routine_request: RoutineCreate,
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoAdminUser,
 ):
     # ✅ Verificar que el cliente exista
@@ -80,7 +80,7 @@ async def create_routine(
 # ---------------------- 👀 Ver todas las rutinas ----------------------
 @router.get('/', response_model=list[RoutineResponse])
 async def get_all_routines(
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoUser,
 ):
     filter_element = Routine.trainer_id if current_user['is_admin'] else Routine.client_id
@@ -94,7 +94,7 @@ async def get_all_routines(
 @router.get('/{routine_id}', response_model=RoutineResponse)
 async def get_routine(
     routine_id: int,
-    db: db_dependency,
+    db: DBSession,
     current_user: AutoUser,
 ):
     routine = db.query(Routine).filter(Routine.id == routine_id).first()
