@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from datetime import datetime  # noqa: TC003
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 from app.database import db_dependency  # noqa: TC001
 from app.models.exercise import Exercise
 from app.models.routine import Routine
 from app.models.user import User
-from app.routers.auth import get_current_user
+from app.routers.auth import AutoAdminUser, AutoUser  # noqa: TC001
 from app.routers.exercises import ExerciseResponse  # noqa: TC001
 
 
@@ -47,15 +47,8 @@ class RoutineResponse(BaseModel):
 async def create_routine(
     routine_request: RoutineCreate,
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoAdminUser,
 ):
-    # 🚫 Solo entrenadores (is_admin=True) pueden crear rutinas
-    if not current_user['is_admin']:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail='Solo los entrenadores pueden crear rutinas.',
-        )
-
     # ✅ Verificar que el cliente exista
     client = db.query(User).filter(User.id == routine_request.client_id).first()
     if not client:
@@ -88,16 +81,13 @@ async def create_routine(
 @router.get('/', response_model=list[RoutineResponse])
 async def get_all_routines(
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoUser,
 ):
+    filter_element = Routine.trainer_id if current_user['is_admin'] else Routine.client_id
     # 🧠 Entrenadores ven sus rutinas creadas
-    if current_user['is_admin']:
-        routines = db.query(Routine).filter(Routine.trainer_id == current_user['id']).all()
-    else:
-        # 🏋️ Clientes ven las que se les asignaron
-        routines = db.query(Routine).filter(Routine.client_id == current_user['id']).all()
+    query = db.query(Routine).filter(filter_element == current_user['id'])
 
-    return routines
+    return query.all()
 
 
 # ---------------------- 🔎 Ver una rutina específica ----------------------
@@ -105,7 +95,7 @@ async def get_all_routines(
 async def get_routine(
     routine_id: int,
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoUser,
 ):
     routine = db.query(Routine).filter(Routine.id == routine_id).first()
     if not routine:

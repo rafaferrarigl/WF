@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.database import Base, set_db
 from app.routers import auth, diets, exercises, food, meal, routines
-from app.routers.auth import user_dependency  # noqa: TC001
+from app.routers.auth import AutoUser  # noqa: TC001
 
 
 app = FastAPI()
@@ -31,7 +31,7 @@ app.add_middleware(
 
 
 @app.get('/auth/me', tags=['auth'])
-async def get_me(user: user_dependency):
+async def get_me(user: AutoUser):
     if user is None:
         raise HTTPException(status_code=404, detail='User not found')
     return user

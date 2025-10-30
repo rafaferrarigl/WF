@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 from app.database import db_dependency  # noqa: TC001
 from app.models.meal import Meal
-from app.routers.auth import get_current_user
+from app.routers.auth import AutoAdminUser  # noqa: TC001
 
 
 router = APIRouter(prefix='/meals', tags=['diets'])
@@ -40,11 +40,8 @@ class MealResponse(BaseModel):
 async def create_meal(
     meal: MealCreate,
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoAdminUser,  # noqa: ARG001
 ):
-    if not current_user['is_admin']:
-        raise HTTPException(status_code=403, detail='Solo entrenadores pueden crear comidas.')
-
     new_meal = Meal(
         name=meal.name,
         description=meal.description,
@@ -60,7 +57,7 @@ async def create_meal(
 @router.get('/', response_model=list[MealResponse])
 async def get_all_meals(
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoAdminUser,  # noqa: ARG001
 ):
     return db.query(Meal).all()
 
@@ -70,7 +67,7 @@ async def get_all_meals(
 async def get_meal(
     meal_id: int,
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoAdminUser,  # noqa: ARG001
 ):
     meal = db.query(Meal).filter(Meal.id == meal_id).first()
     if not meal:

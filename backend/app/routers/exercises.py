@@ -1,14 +1,29 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, status
 from pydantic import BaseModel
+from sqlalchemy import Column, Float, ForeignKey, Integer
+from sqlalchemy.orm import relationship
 
-from app.database import db_dependency  # noqa: TC001
+from app.database import Base, db_dependency
 from app.models.exercise import Exercise
-from app.routers.auth import get_current_user
+from app.models.user import User
+from app.routers.auth import AutoAdminUser  # noqa: TC001
 
 
 router = APIRouter(prefix='/exercises', tags=['routines'])
+
+
+class ExerciseProgress(Base):
+    __tablename__ = 'exercise_progress'
+
+    id = Column(Integer, primary_key=True, index=True)
+    exercise_id = Column(Integer, ForeignKey(Exercise.id.expression))
+    user_id = Column(Integer, ForeignKey(User.id.expression))
+    weight = Column(Float, nullable=True)
+    repetitions = Column(Integer, nullable=True)
+
+    exercise = relationship('Exercise', back_populates='progress')
 
 
 # ---------------------- 📦 Esquemas Pydantic ----------------------
@@ -32,11 +47,8 @@ class ExerciseResponse(BaseModel):
 async def create_exercise(
     exercise: ExerciseCreate,
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoAdminUser,  # noqa: ARG001
 ):
-    if not current_user['is_admin']:
-        raise HTTPException(status_code=403, detail='Solo entrenadores pueden crear ejercicios')
-
     new_exercise = Exercise(
         name=exercise.name,
         description=exercise.description,

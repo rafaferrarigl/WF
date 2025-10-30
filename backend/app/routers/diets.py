@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import joinedload
 
@@ -10,7 +10,7 @@ from app.database import db_dependency  # noqa: TC001
 from app.models.diet import Diet
 from app.models.meal import Meal
 from app.models.user import User
-from app.routers.auth import get_current_user
+from app.routers.auth import AutoAdminUser, AutoUser  # noqa: TC001
 
 
 router = APIRouter(
@@ -58,12 +58,8 @@ class DietCreate(BaseModel):
 async def create_diet(
     diet_request: DietCreate,
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoAdminUser,
 ):
-    # Solo entrenadores
-    if not current_user['is_admin']:
-        raise HTTPException(status_code=403, detail='Solo entrenadores pueden crear dietas.')
-
     # Verificar que el cliente exista
     client = db.query(User).filter(User.id == diet_request.client_id).first()
     if not client:
@@ -73,7 +69,7 @@ async def create_diet(
         name=diet_request.name,
         trainer_id=current_user['id'],
         client_id=diet_request.client_id,
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
     )
 
     db.add(new_diet)
@@ -96,24 +92,16 @@ async def create_diet(
 @router.get('/', response_model=list[DietResponse])
 async def get_all_diets(
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoUser,
 ):
-    if current_user['is_admin']:
-        diets = (
-            db.query(Diet)
-            .options(joinedload(Diet.meals).joinedload(Meal.foods))
-            .filter(Diet.trainer_id == current_user['id'])
-            .all()
-        )
-    else:
-        diets = (
-            db.query(Diet)
-            .options(joinedload(Diet.meals).joinedload(Meal.foods))
-            .filter(Diet.client_id == current_user['id'])
-            .all()
-        )
+    filter_element = Diet.trainer_id if current_user['is_admin'] else Diet.client_id
+    query = (
+        db.query(Diet)
+        .options(joinedload(Diet.meals).joinedload(Meal.foods))
+        .filter(filter_element == current_user['id'])
+    )
 
-    return diets
+    return query.all()
 
 
 # ---------------------- 🔎 Ver una dieta específica ----------------------
@@ -121,7 +109,7 @@ async def get_all_diets(
 async def get_diet(
     diet_id: int,
     db: db_dependency,
-    current_user=Depends(get_current_user),
+    current_user: AutoUser,
 ):
     diet = db.query(Diet).options(joinedload(Diet.meals).joinedload(Meal.foods)).filter(Diet.id == diet_id).first()
     if not diet:

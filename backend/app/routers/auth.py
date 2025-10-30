@@ -18,7 +18,6 @@ from app.models.user import User
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
-
 # -------------------------------------------------------------------
 # 🔧 Configuración básica
 # -------------------------------------------------------------------
@@ -128,7 +127,7 @@ def authenticate_user(username: str, password: str, db: Session):
 def create_access_token(username: str, user_id: int, is_admin: bool, expires_delta: timedelta):
     encode = {'sub': username, 'id': user_id, 'is_admin': is_admin}
     expire = datetime.now(UTC) + expires_delta
-    encode.update({'exp': expire.isoformat()})
+    encode.update({'exp': int(expire.timestamp())})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
@@ -141,7 +140,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         username = payload.get('sub')
         user_id = payload.get('id')
         is_admin = payload.get('is_admin')
-        expire_date = payload.get('exp', datetime.now(UTC).isoformat())
+        expire_date = payload.get('exp', datetime.now(UTC).timestamp())
 
         if username is None or user_id is None:
             raise HTTPException(
@@ -150,7 +149,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
                 headers={'WWW-Authenticate': 'Bearer'},
             )
 
-        if datetime.now(UTC) > datetime.fromisoformat(expire_date):
+        if datetime.now(UTC) > datetime.fromtimestamp(expire_date, UTC):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail='Token has expired',
@@ -167,17 +166,16 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         )
 
 
-user_dependency = Annotated[dict, Depends(get_current_user)]
-
-
-def admin_required(current_user: dict = Depends(get_current_user)):
-    """Dependencia para rutas que requieren permisos de administrador.
-    :param current_user:
-    :return:
-    """
-    if not current_user['is_admin']:
+async def assert_admin_user(token: Annotated[str, Depends(oauth2_bearer)]):
+    user = await get_current_user(token)
+    if not user['is_admin']:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='You do not have permission to perform this action.',
         )
-    return current_user
+
+    return user
+
+
+AutoUser = Annotated[dict, Depends(get_current_user)]
+AutoAdminUser = Annotated[dict, Depends(assert_admin_user)]
