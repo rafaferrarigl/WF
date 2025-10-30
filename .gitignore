@@ -17,3 +17,5 @@ venv/
 dist/
 
 .env
+**/openapi.yaml
+wf-frontend/src/lib/
