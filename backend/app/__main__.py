@@ -40,7 +40,7 @@ def main() -> None:
 
     Database.init(f'postgresql://{db_user}:{db_pass}@database:5432/{db_name}')
 
-    uvicorn.run(app, host='localhost', port=8000)
+    uvicorn.run(app, host='0.0.0.0', port=8000)
 
 
 if __name__ == '__main__':
