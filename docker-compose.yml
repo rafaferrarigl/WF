@@ -9,7 +9,7 @@ services:
       DB_PASS: ${DB_PASS}
       DB_NAME: ${DB_NAME}
     ports:
-      - "5704:8000"
+      - "5704:443"
     depends_on:
       database:
         condition: service_healthy

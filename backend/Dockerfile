@@ -20,10 +20,11 @@ COPY --from=builder /code/wheels wheels/
 RUN python -m pip install --no-cache-dir wheels/* && \
     rm -r wheels
 
+COPY security data/security
 COPY app app
 
 
 CMD [ "python", "-m", "app" ]
 
 
-EXPOSE 8000
+EXPOSE 443
