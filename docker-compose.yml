@@ -9,13 +9,10 @@ services:
       DB_PASS: ${DB_PASS}
       DB_NAME: ${DB_NAME}
     ports:
-       - "5704:8000"
+      - "5704:8000"
     depends_on:
       database:
         condition: service_healthy
-    volumes:
-      - files:/code/files
-      - migrations:/code/migrations/versions
     restart: unless-stopped
     pull_policy: build
 
