@@ -1,3 +1,42 @@
+name: rfg
+
 services:
-  redis:
-    image: "redis:latest"
+  backend:
+    build:
+      context: backend
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+    ports:
+       - "5704:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - files:/code/files
+      - migrations:/code/migrations/versions
+    restart: unless-stopped
+    pull_policy: build
+
+  database:
+    image: postgres:14.19-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}" ]
+      interval: 1m
+      timeout: 1s
+      start_interval: 1s
+      start_period: 5s
+    restart: unless-stopped
+
+
+volumes:
+  db-volume: null

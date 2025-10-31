@@ -34,8 +34,11 @@ async def get_me(user: AutoUser) -> AutoUser:
 
 
 def main() -> None:
-    db_url = environ['DATABASE_URL']
-    Database.init(db_url)
+    db_user = environ['DB_USER']
+    db_pass = environ['DB_PASS']
+    db_name = environ['DB_NAME']
+
+    Database.init(f'postgresql://{db_user}:{db_pass}@database:5432/{db_name}')
 
     uvicorn.run(app, host='localhost', port=8000)
 
