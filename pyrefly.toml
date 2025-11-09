@@ -1,7 +1,7 @@
 project-includes = ['backend/**/*.py']
 project-excludes = []
 use-ignore-files = true
-search-path = ['backend']
+search-path = ['']
 disable-search-path-heuristics = false
 site-package-path = ['.venv/Lib/site-packages']
 
