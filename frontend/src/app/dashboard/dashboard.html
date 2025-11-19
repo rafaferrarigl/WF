@@ -1,0 +1,111 @@
+<!-- user-dashboard.html (solo el contenido del componente) -->
+<div class="dashboard">
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand_img" src="/logo.ico"> Warson Fit
+    </div>
+    <div class="user-summary">
+      <img class="avatar" src="/assets/avatar-placeholder.png" alt="avatar">
+      <div class="user-info">
+        <div class="name">Rafa Gómez</div>
+        <div class="role">Cliente</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="active">Perfil</li>
+          <li>Entrenamientos</li>
+          <li>Dieta</li>
+          <li>Progreso</li>
+          <li>Mensajes</li>
+        </ul>
+      </nav>
+      <div class="quick-stats">
+        <div class="stat">
+          <div class="label">Peso</div>
+          <div class="value">78 kg</div>
+        </div>
+        <div class="stat">
+          <div class="label">Altura</div>
+          <div class="value">1.78 m</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <!-- Top cards -->
+      <section class="cards">
+        <article class="card">
+          <h4>Próximo entrenamiento</h4>
+          <p class="muted">Mié, 20 Nov · 18:00</p>
+          <p class="big">Full body: fuerza</p>
+          <button class="btn-outline">Ver entrenamiento</button>
+        </article>
+
+        <article class="card">
+          <h4>Dieta recomendada</h4>
+          <p class="muted">Calorías objetivo</p>
+          <p class="big">2,300 kcal / día</p>
+          <button class="btn-outline">Ver plan</button>
+        </article>
+
+        <article class="card">
+          <h4>Seguimiento</h4>
+          <p class="muted">Última entrada</p>
+          <p class="big">Progreso +1.2 kg fuerza</p>
+          <button class="btn-outline">Ver progreso</button>
+        </article>
+      </section>
+
+      <!-- Detailed area: ejemplo Entrenamientos -->
+      <section class="panel">
+        <h3>Entrenamientos recientes</h3>
+        <div class="training-list">
+          <!-- Reemplazar por *ngFor -->
+          <div class="training-item">
+            <div class="ti-left">
+              <div class="ti-title">Full body - Fuerza</div>
+              <div class="muted">15 Nov · 45 min</div>
+            </div>
+            <div class="ti-right">
+              <button class="btn">Ver</button>
+            </div>
+          </div>
+
+          <div class="training-item">
+            <div class="ti-left">
+              <div class="ti-title">Cardio HIIT</div>
+              <div class="muted">12 Nov · 30 min</div>
+            </div>
+            <div class="ti-right">
+              <button class="btn">Ver</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dieta resumen -->
+      <section class="panel">
+        <h3>Dieta de la semana</h3>
+        <div class="diet-grid">
+          <div class="meal-card">
+            <div class="meal-title">Desayuno</div>
+            <div class="muted">Avena, plátano, leche</div>
+          </div>
+          <div class="meal-card">
+            <div class="meal-title">Almuerzo</div>
+            <div class="muted">Arroz integral, pollo</div>
+          </div>
+          <div class="meal-card">
+            <div class="meal-title">Cena</div>
+            <div class="muted">Ensalada + salmón</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,77 @@
+/* user-dashboard.css - estilos del componente */
+:host { display: block; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color: #111; }
+
+/* Layout general */
+.dashboard { min-height: 100vh; background: linear-gradient(180deg,#1F1F21 0%, #1F1F21 60%); color: #e8eef6; }
+.topbar {
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 18px 28px; border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight:700;
+  font-size:18px;
+  color:#fff;
+}
+.brand_img {
+  width: 18%;
+}
+.user-summary { display:flex; align-items:center; gap:12px; }
+.avatar { width:48px; height:48px; border-radius:10px; object-fit:cover; border:2px solid rgba(255,255,255,0.06); }
+.user-info .name { font-weight:600; }
+.user-info .role { font-size:12px; color:#9aa6b2; }
+
+/* Layout: sidebar + content */
+.layout { display:flex; gap:20px; padding: 28px; max-width:1200px; margin: 0 auto; box-sizing:border-box; }
+.sidebar {
+  width: 230px; background: rgba(255,255,255,0.02); border-radius:12px; padding:18px;
+  display:flex; flex-direction:column; gap:16px; box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
+.sidebar nav ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
+.sidebar nav li {
+  padding: 10px 12px; border-radius:8px; cursor:pointer; color:#cfe3f6; font-weight:600;
+}
+.sidebar nav li.active { background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03)); box-shadow: inset 0 -2px 0 rgba(255,255,255,0.02); }
+.quick-stats { margin-top:auto; display:flex; flex-direction:column; gap:8px; }
+.stat { display:flex; justify-content:space-between; font-weight:600; color:#bcd3e6; }
+
+/* Main content */
+.content { flex:1; display:flex; flex-direction:column; gap:18px; }
+.cards { display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; }
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.018));
+  padding:16px; border-radius:12px; box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
+.card h4 { margin:0 0 6px 0; font-size:14px; color:#fff; }
+.muted { color:#9aa6b2; font-size:13px; }
+.big { font-weight:700; margin:8px 0; font-size:16px; color:#fff; }
+.btn-outline {
+  background:transparent; border:1px solid rgba(255,255,255,0.06); color:#cfe3f6; padding:8px 12px; border-radius:8px; cursor:pointer;
+}
+
+/* Panels */
+.panel { background: rgba(255,255,255,0.02); border-radius:12px; padding:14px; }
+.panel h3 { margin:0 0 12px 0; color:#fff; }
+.training-list { display:flex; flex-direction:column; gap:10px; }
+.training-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:8px; background: rgba(255,255,255,0.01); }
+.ti-title { font-weight:700; color:#fff; }
+.ti-right .btn { background:#2b8cff; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+
+/* Diet grid */
+.diet-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:10px; }
+.meal-card { background: rgba(255,255,255,0.01); padding:12px; border-radius:8px; text-align:left; }
+.meal-title { font-weight:700; color:#fff; margin-bottom:6px; }
+
+/* Responsive */
+@media (max-width: 980px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+  .layout { padding:16px; }
+  .sidebar { display:none; } /* Podrías convertirla en drawer */
+}
+@media (max-width: 640px) {
+  .cards { grid-template-columns: 1fr; }
+  .diet-grid { grid-template-columns: 1fr; }
+  .layout { padding:12px; flex-direction:column; }
+}

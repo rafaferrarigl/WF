@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+
+
+  <div class="page">
+    <form [formGroup]="form" (ngSubmit)="login()">
+        <h3>Login Here</h3>
+
+        <label for="username">Username</label>
+        <input  id="username" formControlName="username" type="text" placeholder="Username">
+
+        <label for="password">Password</label>
+        <input  id="password" formControlName="password" type="password" placeholder="Password">
+
+        <button type="submit" class="login_button">Log In</button>
+        <button type="button" class="register_button">Register</button>
+    </form>
+  </div>

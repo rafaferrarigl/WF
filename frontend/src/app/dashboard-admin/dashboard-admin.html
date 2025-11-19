@@ -1,0 +1,86 @@
+<div class="dashboard">
+  <header class="topbar">
+    <div class="brand">🏋️‍♂️ FitCoach Admin</div>
+    <div class="admin-summary">
+      <img class="avatar" src="/assets/admin-avatar.png" alt="avatar">
+      <div class="user-info">
+        <div class="name">Administrador</div>
+        <div class="role">Admin</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <nav>
+        <ul>
+          <li class="active">Clientes</li>
+          <li>Dietas</li>
+          <li>Entrenamientos</li>
+          <li>Progreso</li>
+          <li>Mensajes</li>
+        </ul>
+      </nav>
+      <div class="quick-stats">
+        <div class="stat">
+          <div class="label">Clientes</div>
+          <div class="value">12</div>
+        </div>
+        <div class="stat">
+          <div class="label">Entrenamientos activos</div>
+          <div class="value">34</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <!-- Clientes recientes -->
+      <section class="panel">
+        <h3>Clientes recientes</h3>
+        <div class="client-list">
+          <!-- Reemplazar con *ngFor en Angular -->
+          <div class="client-item">
+            <div class="ci-left">
+              <div class="ci-name">Rafa Gómez</div>
+              <div class="muted">Cliente desde 01 Nov 2025</div>
+            </div>
+            <div class="ci-right">
+              <button class="btn">Ver</button>
+              <button class="btn-outline">Asignar dieta</button>
+              <button class="btn-outline">Asignar entrenamiento</button>
+            </div>
+          </div>
+
+          <div class="client-item">
+            <div class="ci-left">
+              <div class="ci-name">Laura Pérez</div>
+              <div class="muted">Cliente desde 05 Nov 2025</div>
+            </div>
+            <div class="ci-right">
+              <button class="btn">Ver</button>
+              <button class="btn-outline">Asignar dieta</button>
+              <button class="btn-outline">Asignar entrenamiento</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Progreso global -->
+      <section class="panel">
+        <h3>Progreso de clientes</h3>
+        <div class="progress-grid">
+          <div class="progress-card">
+            <div class="client-name">Rafa Gómez</div>
+            <div class="muted">Fuerza: +1.2 kg</div>
+            <div class="muted">Peso: -0.5 kg</div>
+          </div>
+          <div class="progress-card">
+            <div class="client-name">Laura Pérez</div>
+            <div class="muted">Fuerza: +0.8 kg</div>
+            <div class="muted">Peso: -0.2 kg</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
