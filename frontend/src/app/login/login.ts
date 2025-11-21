@@ -8,25 +8,22 @@ import { AuthService } from '../service/auth.service';
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrls: ['./login.css']
 })
 export class Login {
 
   form: any;
 
-
   constructor(
     private auth: AuthService,
     private router: Router,
-    private fb: FormBuilder,
-  ){
+    private fb: FormBuilder
+  ) {
     this.form = this.fb.group({
-    username: ['', Validators.required],
-    password: ['', Validators.required]
-  });
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
   }
-
-
 
   login() {
     if (this.form.invalid) return;
@@ -34,17 +31,11 @@ export class Login {
     const username = this.form.value.username!;
     const password = this.form.value.password!;
 
-
     this.auth.login(username, password).subscribe({
-      next: (res) => {
-
-        localStorage.setItem('token', res.access_token);
-
-
+      next: () => {
         this.auth.me().subscribe({
           next: (user: any) => {
             console.log("Usuario autenticado:", user);
-
             if (user.is_admin) {
               this.router.navigate(['/dashboardadmin']);
             } else {
@@ -54,12 +45,7 @@ export class Login {
           error: (err) => console.error("Error obteniendo usuario:", err)
         });
       },
-
-
-
-      error: (err) => console.error('Login fallo', err)
-
-
-    })
+      error: (err) => console.error('Login falló', err)
+    });
   }
 }

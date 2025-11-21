@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
 
   private login_url = 'http://127.0.0.1:8443/auth/login';
@@ -18,17 +20,14 @@ export class AuthService {
     return this.http.post(this.login_url, body.toString(), {
       headers: new HttpHeaders({
         'Content-Type': 'application/x-www-form-urlencoded'
-      })
+      }),
+      withCredentials: true
     });
   }
 
-  me() {
-    const token = localStorage.getItem('token');
-
+  me(): Observable<any> {
     return this.http.get(this.me_url, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      withCredentials: true
     });
   }
 }

@@ -1,13 +1,15 @@
-<!-- user-dashboard.html (solo el contenido del componente) -->
+@if (user$ | async; as user) {
 <div class="dashboard">
+
   <header class="topbar">
     <div class="brand">
       <img class="brand_img" src="/logo.ico"> Warson Fit
     </div>
+
     <div class="user-summary">
       <img class="avatar" src="/assets/avatar-placeholder.png" alt="avatar">
       <div class="user-info">
-        <div class="name">Rafa Gómez</div>
+        <div class="name">{{ user.username }}</div>
         <div class="role">Cliente</div>
       </div>
     </div>
@@ -24,19 +26,25 @@
           <li>Mensajes</li>
         </ul>
       </nav>
+
       <div class="quick-stats">
         <div class="stat">
           <div class="label">Peso</div>
-          <div class="value">78 kg</div>
+          <div class="value">{{ user.weight }} kg</div>
         </div>
         <div class="stat">
           <div class="label">Altura</div>
-          <div class="value">1.78 m</div>
+          <div class="value">{{ user.height }} cm</div>
+        </div>
+        <div class="stat">
+          <div class="label">Sexo</div>
+          <div class="value">{{ user.gender }}</div>
         </div>
       </div>
     </aside>
 
     <main class="content">
+
       <!-- Top cards -->
       <section class="cards">
         <article class="card">
@@ -61,11 +69,11 @@
         </article>
       </section>
 
-      <!-- Detailed area: ejemplo Entrenamientos -->
+      <!-- Entrenamientos -->
       <section class="panel">
         <h3>Entrenamientos recientes</h3>
+
         <div class="training-list">
-          <!-- Reemplazar por *ngFor -->
           <div class="training-item">
             <div class="ti-left">
               <div class="ti-title">Full body - Fuerza</div>
@@ -88,9 +96,10 @@
         </div>
       </section>
 
-      <!-- Dieta resumen -->
+      <!-- Dieta -->
       <section class="panel">
         <h3>Dieta de la semana</h3>
+
         <div class="diet-grid">
           <div class="meal-card">
             <div class="meal-title">Desayuno</div>
@@ -106,6 +115,9 @@
           </div>
         </div>
       </section>
+
     </main>
   </div>
+
 </div>
+}

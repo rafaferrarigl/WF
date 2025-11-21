@@ -1,11 +1,20 @@
 import { Component } from '@angular/core';
+import { UserService, User } from '../service/user';
+import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+  styleUrls: ['./dashboard.css']
 })
 export class Dashboard {
 
+  user$: Observable<User | null>;
+
+  constructor(private userService: UserService) {
+    this.user$ = this.userService.getCurrentUser();
+  }
 }

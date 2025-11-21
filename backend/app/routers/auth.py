@@ -39,7 +39,10 @@ class AuthUser(BaseModel):
     user_id: int
     username: str
     is_admin: bool
-
+    birth_date: date | None = None
+    height: float | None = None
+    weight: float | None = None
+    gender: str | None = None
 
 # -------------------------------------------------------------------
 # 📦 Modelos Pydantic
@@ -148,10 +151,8 @@ def create_access_token(jwt_data: JwtTokenData) -> str:
     return jwt.encode(jwt_data.model_dump(), SECRET_KEY, algorithm=ALGORITHM)
 
 
-# -------------------------------------------------------------------
-# 🧠 Obtener usuario actual desde el token
-# -------------------------------------------------------------------
-async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]) -> AuthUser:
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)], db:DBSession) -> AuthUser:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
@@ -180,7 +181,22 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]) -> Aut
             headers={'WWW-Authenticate': 'Bearer'},
         )
 
-    return AuthUser(username=username, user_id=user_id, is_admin=is_admin)
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return AuthUser(
+        username=username,
+        user_id=user_id,
+        is_admin=is_admin,
+        birth_date=user.birth_date,
+        height=user.height,
+        weight=user.weight,
+        gender=user.gender
+    )
 
 
 async def assert_admin_user(token: Annotated[str, Depends(oauth2_bearer)]) -> AuthUser:

@@ -1,0 +1,118 @@
+
+.page {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+
+
+    background-image: url("/logo.png");
+
+
+    background-size: 1000px;
+
+    background-repeat: no-repeat;
+    background-position: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.background{
+    width: 430px;
+    height: 520px;
+    position: absolute;
+    transform: translate(-50%,-50%);
+    left: 50%;
+    top: 50%;
+}
+
+
+form{
+    height: 520px;
+    width: 400px;
+    background-color: rgba(255,255,255,0.13);
+    position: absolute;
+    transform: translate(-50%,-50%);
+    top: 50%;
+    left: 50%;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 40px rgba(8,7,16,0.6);
+    padding: 50px 35px;
+}
+form *{
+    font-family: 'Poppins',sans-serif;
+
+    letter-spacing: 1px;
+    outline: none;
+    border: none;
+}
+form h3{
+
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 42px;
+    text-align: center;
+}
+h3{
+  color: white;
+}
+
+label{
+
+    display: block;
+    margin-top: 30px;
+    font-size: 22px;
+    font-weight: 500;
+}
+input{
+
+    display: block;
+    height: 50px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 3px;
+    padding: 0 10px;
+    margin-top: 8px;
+    font-size: 20px;
+    font-weight: 300;
+}
+::placeholder{
+    color: #000000;
+}
+.login_button{
+    margin-top: 50px;
+    width: 100%;
+    background-color: #ff3131;
+    color: #ffffff;
+    padding: 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.register_button{
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
+  background-color: #1F1F21;
+  color: #ffffff;
+
+  padding: 10px 0;
+  font-size: 18px;
+  font-weight: 400;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+nput:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.5) inset !important;
+
+    -webkit-text-fill-color: #000 !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
