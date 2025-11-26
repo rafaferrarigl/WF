@@ -12,8 +12,8 @@ class Meal(Database.base):
 
     id = Column(Integer, primary_key=True, index=True)
     diet_id = Column(Integer, ForeignKey(Diet.id.expression))
-    name = Column(String, nullable=False)  # Ej: Desayuno
-    description = Column(String, nullable=True)  # 🆕 Nueva columna
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
     total_calories = Column(Float, default=0)
 
     foods = relationship('Food', back_populates='meal')

@@ -19,7 +19,6 @@ router = APIRouter(
 )
 
 
-# ---------------------- 📦 Esquemas Pydantic ----------------------
 
 
 class FoodResponse(BaseModel):

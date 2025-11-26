@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
 # -------------------------------------------------------------------
-# 🔧 Configuración básica
+# Configuración básica
 # -------------------------------------------------------------------
 router = APIRouter(
     prefix='/auth',
@@ -38,19 +38,22 @@ oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
 class AuthUser(BaseModel):
     user_id: int
     username: str
+    first_name: str
+    last_name: str
     is_admin: bool
     birth_date: date | None = None
     height: float | None = None
     weight: float | None = None
     gender: str | None = None
 
-# -------------------------------------------------------------------
-# 📦 Modelos Pydantic
-# -------------------------------------------------------------------
+
 class CreateUserRequest(BaseModel):
     username: str
     email: str
     password: str
+    first_name: str
+    last_name: str
+
     is_admin: bool = False
     birth_date: date | None = None
     height: float | None = None
@@ -75,7 +78,7 @@ class JwtTokenData(BaseModel):
 
 
 # -------------------------------------------------------------------
-# 👤 Crear nuevo usuario
+# Crear nuevo usuario
 # -------------------------------------------------------------------
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_user(db: DBSession, create_user_request: CreateUserRequest) -> None:
@@ -95,6 +98,8 @@ async def create_user(db: DBSession, create_user_request: CreateUserRequest) -> 
         username=create_user_request.username,
         email=create_user_request.email,
         hashed_password=bcrypt_context.hash(create_user_request.password),
+        first_name=create_user_request.first_name,
+        last_name=create_user_request.last_name,
         is_admin=create_user_request.is_admin,
         birth_date=create_user_request.birth_date,
         height=create_user_request.height,
@@ -108,7 +113,7 @@ async def create_user(db: DBSession, create_user_request: CreateUserRequest) -> 
 
 
 # -------------------------------------------------------------------
-# 🔐 Login
+# Login
 # -------------------------------------------------------------------
 @router.post('/login', response_model=Token)
 async def login_for_access_token(
@@ -137,7 +142,7 @@ async def login_for_access_token(
 
 
 # -------------------------------------------------------------------
-# 🔑 Funciones auxiliares
+# Funciones auxiliares
 # -------------------------------------------------------------------
 def authenticate_user(username: str, password: str, db: Session) -> User | None:
     user = db.query(User).filter(User.username == username).first()
@@ -145,6 +150,7 @@ def authenticate_user(username: str, password: str, db: Session) -> User | None:
         return None
 
     return user
+
 
 
 def create_access_token(jwt_data: JwtTokenData) -> str:
@@ -185,17 +191,19 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)], db:DBS
     if not user:
         raise HTTPException(
             status_code=404,
-            detail="User not found"
+            detail='User not found',
         )
 
     return AuthUser(
         username=username,
         user_id=user_id,
         is_admin=is_admin,
+        first_name=user.first_name,
+        last_name=user.last_name,
         birth_date=user.birth_date,
         height=user.height,
         weight=user.weight,
-        gender=user.gender
+        gender=user.gender,
     )
 
 

@@ -12,6 +12,10 @@ class User(Database.base):
     username = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
+
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+
     is_admin = Column(Boolean, default=False)
 
     birth_date = Column(Date, nullable=True)
