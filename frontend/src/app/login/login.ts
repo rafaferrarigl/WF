@@ -32,7 +32,8 @@ export class Login {
     const password = this.form.value.password!;
 
     this.auth.login(username, password).subscribe({
-      next: () => {
+      next: (res) => {
+        localStorage.setItem('token', res.access_token)
         this.auth.me().subscribe({
           next: (user: any) => {
             console.log("Usuario autenticado:", user);

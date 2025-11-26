@@ -20,14 +20,18 @@ export class AuthService {
     return this.http.post(this.login_url, body.toString(), {
       headers: new HttpHeaders({
         'Content-Type': 'application/x-www-form-urlencoded'
-      }),
-      withCredentials: true
+      })
     });
   }
 
+
   me(): Observable<any> {
-    return this.http.get(this.me_url, {
-      withCredentials: true
+    const token = localStorage.getItem('token');
+
+    return this.http.get<any>(this.me_url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
   }
 }
