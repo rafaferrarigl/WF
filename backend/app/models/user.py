@@ -13,8 +13,8 @@ class User(Database.base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
 
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
+    first_name = Column(String, nullable=False, default='')
+    last_name = Column(String, nullable=False, default='')
 
     is_admin = Column(Boolean, default=False)
 

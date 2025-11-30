@@ -94,7 +94,6 @@ input{
     cursor: pointer;
 }
 .register_button{
-  align-items: center;
   margin-top: 20px;
   width: 100%;
   background-color: #1F1F21;
