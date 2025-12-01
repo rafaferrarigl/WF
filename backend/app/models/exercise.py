@@ -21,3 +21,5 @@ class Exercise(Database.base):
     progress = relationship('ExerciseProgress', back_populates='exercise')
 
     routine = relationship('Routine', back_populates='exercises')
+
+from .exercise_progress import ExerciseProgress

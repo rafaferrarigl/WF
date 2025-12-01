@@ -14,18 +14,6 @@ from app.routers.auth import AutoAdminUser  # noqa: TC001
 router = APIRouter(prefix='/exercises', tags=['routines'])
 
 
-class ExerciseProgress(Database.base):
-    __tablename__ = 'exercise_progress'
-
-    id = Column(Integer, primary_key=True, index=True)
-    exercise_id = Column(Integer, ForeignKey(Exercise.id.expression))
-    user_id = Column(Integer, ForeignKey(User.id.expression))
-    weight = Column(Float, nullable=True)
-    repetitions = Column(Integer, nullable=True)
-
-    exercise = relationship('Exercise', back_populates='progress')
-
-
 # ---------------------- 📦 Esquemas Pydantic ----------------------
 class ExerciseCreate(BaseModel):
     name: str

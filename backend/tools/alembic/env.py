@@ -18,6 +18,7 @@ from app.models.food import Food
 from app.models.exercise import Exercise
 from app.models.routine import Routine
 from app.models.user import User
+from app.models.exercise_progress import ExerciseProgress
 
 
 target_metadata = Database.base.metadata

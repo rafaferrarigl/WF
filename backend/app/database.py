@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any
 
+from alembic.command import upgrade
+from alembic.config import Config
 from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
@@ -19,7 +22,11 @@ class Database:
     def init(cls, db_url: str) -> None:
         engine = create_engine(db_url)
         cls._session_maker = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-        cls.base.metadata.create_all(bind=engine)
+
+        config = Config(Path(__file__).parent.parent / "alembic.ini")
+        config.set_main_option("sqlalchemy.url", db_url.replace('%', '%%'))
+
+        upgrade(config, 'head')
 
     @classmethod
     def get_session(cls) -> Generator[Session | Any, Any, None]:
