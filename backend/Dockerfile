@@ -21,6 +21,7 @@ RUN python -m pip install --no-cache-dir wheels/* && \
     rm -r wheels
 
 COPY security data/security
+COPY alembic alembic
 COPY app app
 
 
