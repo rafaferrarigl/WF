@@ -53,8 +53,6 @@ class CreateUserRequest(BaseModel):
     password: str
     first_name: str
     last_name: str
-
-    is_admin: bool = False
     birth_date: date | None = None
     height: float | None = None
     weight: float | None = None
@@ -100,7 +98,7 @@ async def create_user(db: DBSession, create_user_request: CreateUserRequest) -> 
         hashed_password=bcrypt_context.hash(create_user_request.password),
         first_name=create_user_request.first_name,
         last_name=create_user_request.last_name,
-        is_admin=create_user_request.is_admin,
+        is_admin=False,
         birth_date=create_user_request.birth_date,
         height=create_user_request.height,
         weight=create_user_request.weight,
