@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any
 
@@ -23,7 +24,11 @@ class Database:
         engine = create_engine(db_url)
         cls._session_maker = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-        config = Config(Path(__file__).parent.parent / "alembic.ini")
+        alembic_path = os.path.join(os.getcwd(), "alembic", "alembic.ini")
+        config = Config(alembic_path)
+
+        # Ajustar el script_location si es necesario
+        config.set_main_option("script_location", "alembic/alembic")
         config.set_main_option("sqlalchemy.url", db_url.replace('%', '%%'))
 
         upgrade(config, 'head')
