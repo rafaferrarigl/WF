@@ -206,7 +206,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)], db:DBS
 
 
 async def assert_admin_user(token: Annotated[str, Depends(oauth2_bearer)]) -> AuthUser:
-    user = await get_current_user(token, DBSession)
+    user = await get_current_user(token)
     if not user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
