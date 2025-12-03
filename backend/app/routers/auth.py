@@ -213,7 +213,7 @@ async def assert_admin_user(current_user: Annotated[AuthUser, Depends(get_curren
             detail='You do not have permission to perform this action.',
         )
 
-    return user
+    return current_user
 
 
 AutoUser = Annotated[AuthUser, Depends(get_current_user)]
