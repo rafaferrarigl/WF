@@ -205,9 +205,9 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)], db:DBS
     )
 
 
-async def assert_admin_user(token: Annotated[str, Depends(oauth2_bearer)]) -> AuthUser:
-    user = await get_current_user(token)
-    if not user.is_admin:
+async def assert_admin_user(current_user: Annotated[AuthUser, Depends(get_current_user)]
+) -> AuthUser:
+    if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='You do not have permission to perform this action.',
