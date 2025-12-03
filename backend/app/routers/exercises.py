@@ -2,12 +2,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter, status
 from pydantic import BaseModel
-from sqlalchemy import Column, Float, ForeignKey, Integer
-from sqlalchemy.orm import relationship
-
 from app.database import DBSession, Database
 from app.models.exercise import Exercise
-from app.models.user import User
 from app.routers.auth import AutoAdminUser  # noqa: TC001
 
 
