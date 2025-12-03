@@ -46,4 +46,10 @@ async def create_exercise(
     db.add(new_exercise)
     db.commit()
     db.refresh(new_exercise)
-    return new_exercise
+    return ExerciseResponse(
+        id=new_exercise.id,
+        name=new_exercise.name,
+        description=new_exercise.description,
+        video_url=new_exercise.video_url,
+        comment=new_exercise.comment,
+    )
