@@ -26,6 +26,7 @@ class ExerciseResponse(BaseModel):
     comment: str | None
 
 
+
 # ----------------------  Crear ejercicio ----------------------
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_exercise(
@@ -52,13 +53,11 @@ async def create_exercise(
 
 
 # ---------------------- Ver ejercios ----------------------
-@router.get('/{id}', status_code=status.HTTP_200_OK, response_model=ExerciseResponse)
-async def get_exercise(
+@router.get('/', status_code=status.HTTP_200_OK, response_model=list[ExerciseResponse])
+async def get_all_exercises(
         db: DBSession,
-        id: int,
         current_user: AutoAdminUser,  # noqa: ARG001
-) -> ExerciseResponse:
-    exercise = db.query(Exercise).get(id)
-    if not exercise:
-        raise HTTPException(status_code=404, detail="Ejercicio no encontrado")
-    return exercise
+) -> list[ExerciseResponse]:
+    exercises = db.query(Exercise).all()
+
+    return exercises
