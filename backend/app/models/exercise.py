@@ -22,4 +22,4 @@ class Exercise(Database.base):
 
     routine = relationship('Routine', back_populates='exercises')
 
-from .exercise_progress import ExerciseProgress
+    routine_exercises = relationship("RoutineExercise", back_populates="exercise")

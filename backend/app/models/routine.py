@@ -18,3 +18,5 @@ class Routine(Database.base):
     client_id = Column(Integer, ForeignKey(User.id.expression))  # el cliente asignado
 
     exercises = relationship('Exercise', back_populates='routine')
+
+    routine_exercises = relationship("RoutineExercise", back_populates="routine")
