@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
 from pydantic import BaseModel
 from app.database import DBSession, Database
 from app.models.exercise import Exercise
@@ -49,3 +49,16 @@ async def create_exercise(
         video_url=new_exercise.video_url,
         comment=new_exercise.comment,
     )
+
+
+# ---------------------- Ver ejercios ----------------------
+@router.get('/{id}', status_code=status.HTTP_200_OK, response_model=ExerciseResponse)
+async def get_exercise(
+        db: DBSession,
+        id: int,
+        current_user: AutoAdminUser,  # noqa: ARG001
+) -> ExerciseResponse:
+    exercise = db.query(Exercise).get(id)
+    if not exercise:
+        raise HTTPException(status_code=404, detail="Ejercicio no encontrado")
+    return exercise
