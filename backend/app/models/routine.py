@@ -14,8 +14,8 @@ class Routine(Database.base):
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
-    trainer_id = Column(Integer, ForeignKey(User.id.expression))  # el entrenador que la creó
-    client_id = Column(Integer, ForeignKey(User.id.expression))  # el cliente asignado
+    trainer_id = Column(Integer, ForeignKey(User.id.expression))
+    client_id = Column(Integer, ForeignKey(User.id.expression))
 
     exercises = relationship('Exercise', back_populates='routine')
 

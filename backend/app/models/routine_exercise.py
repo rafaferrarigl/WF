@@ -16,4 +16,6 @@ class RoutineExercise(Database.base):
     max_repeats = Column(Integer)
     set = Column(Integer)
 
-    exercises = relationship("Exercise", back_populates="routine_exercise")
+    exercise = relationship("Exercise", back_populates="routine_exercises")
+    routine = relationship("Routine", back_populates="routine_exercises")
+

@@ -11,13 +11,12 @@ class Exercise(Database.base):
     __tablename__ = 'exercises'
 
     id = Column(Integer, primary_key=True, index=True)
-    routine_id = Column(Integer, ForeignKey(Routine.id.expression))
+    routine_id = Column(Integer, ForeignKey('routines.id'))  # opcional si usas RoutineExercise
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     video_url = Column(String, nullable=True)
     comment = Column(Text, nullable=True)
 
-    # Relación con el progreso del cliente (peso y repeticiones)
     progress = relationship('ExerciseProgress', back_populates='exercise')
 
     routine = relationship('Routine', back_populates='exercises')
