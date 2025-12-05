@@ -10,7 +10,7 @@ from app.routers.auth import AutoAdminUser  # noqa: TC001
 router = APIRouter(prefix='/exercises', tags=['routines'])
 
 
-# ---------------------- 📦 Esquemas Pydantic ----------------------
+# ----------------------  Esquemas Pydantic ----------------------
 class ExerciseCreate(BaseModel):
     name: str
     description: str | None = None
@@ -26,7 +26,7 @@ class ExerciseResponse(BaseModel):
     comment: str | None
 
 
-# ---------------------- 🏋️ Crear ejercicio ----------------------
+# ----------------------  Crear ejercicio ----------------------
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_exercise(
     exercise: ExerciseCreate,

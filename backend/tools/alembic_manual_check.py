@@ -27,7 +27,7 @@ def main():
     db_name = environ['DB_NAME']
 
     db_url = f"postgresql://{db_user}:{db_pass}@localhost:5432/{db_name}"
-    config = Config(Path(__file__).parent / "alembic.ini")
+    config = Config(str(Path(__file__).parent.parent / "alembic" / "alembic.ini"))
     config.set_main_option("sqlalchemy.url", db_url.replace('%', '%%'))
 
     while True:
