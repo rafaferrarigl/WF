@@ -9,8 +9,8 @@ class RoutineExercise(Database.base):
     __tablename__ = 'routine_exercise'
 
     id = Column(Integer, primary_key=True)
-    exercise_id = Column(Integer, ForeignKey('routine_exercise.exercise_id'))
-    rutine_id = Column(Integer, ForeignKey('routine_exercise.rutine_id'))
+    exercise_id = Column(Integer, ForeignKey('exercises.id'), nullable=False)
+    routine_id = Column(Integer, ForeignKey('routines.id'), nullable=False)
 
     min_repeats = Column(Integer)
     max_repeats = Column(Integer)
