@@ -20,7 +20,7 @@ from app.models.routine_exercise import RoutineExercise
 from app.models.routine import Routine
 from app.models.user import User
 from app.models.exercise_progress import ExerciseProgress
-
+from app.models.food_meal import FoodMeal
 
 target_metadata = Database.base.metadata
 

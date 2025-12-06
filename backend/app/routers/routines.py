@@ -33,7 +33,7 @@ class RoutineCreate(BaseModel):
     name: str
     description: str | None = None
     client_id: int
-    exercises: list[RoutineExerciseCreate] = []   # 👈 CORREGIDO
+    exercises: list[RoutineExerciseCreate] = []
 
 
 class RoutineExerciseResponse(BaseModel):
@@ -56,8 +56,7 @@ class RoutineResponse(BaseModel):
     client_id: int
     exercises: list[RoutineExerciseResponse] = []
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 # ----------------------  Crear rutina ----------------------

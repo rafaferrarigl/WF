@@ -7,6 +7,7 @@ from app.database import Database
 from app.models.diet import Diet
 
 
+
 class Meal(Database.base):
     __tablename__ = 'meals'
 
@@ -18,3 +19,4 @@ class Meal(Database.base):
 
     foods = relationship('Food', back_populates='meal')
     diet = relationship('Diet', back_populates='meals')
+    food_meals = relationship('FoodMeal', back_populates='meal')

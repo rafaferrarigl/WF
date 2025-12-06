@@ -11,7 +11,7 @@ class Exercise(Database.base):
     __tablename__ = 'exercises'
 
     id = Column(Integer, primary_key=True, index=True)
-    routine_id = Column(Integer, ForeignKey('routines.id'))  # opcional si usas RoutineExercise
+    routine_id = Column(Integer, ForeignKey('routines.id'))
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     video_url = Column(String, nullable=True)
