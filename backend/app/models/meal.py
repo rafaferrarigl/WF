@@ -7,7 +7,6 @@ from app.database import Database
 from app.models.diet import Diet
 
 
-
 class Meal(Database.base):
     __tablename__ = 'meals'
 
@@ -15,8 +14,13 @@ class Meal(Database.base):
     diet_id = Column(Integer, ForeignKey(Diet.id.expression))
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    total_calories = Column(Float, default=0)
 
-    foods = relationship('Food', back_populates='meal')
-    diet = relationship('Diet', back_populates='meals')
-    food_meals = relationship('FoodMeal', back_populates='meal')
+    diet = relationship(
+        'Diet',
+        back_populates='meals'
+    )
+    food_meals = relationship(
+        'FoodMeal',
+        back_populates='meal'
+    )
+

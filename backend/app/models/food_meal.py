@@ -4,16 +4,13 @@ from sqlalchemy.orm import relationship
 from app.database import Database
 
 
-
 class FoodMeal(Database.base):
     __tablename__ = 'food_meal'
 
     id = Column(Integer, primary_key=True)
     food_id = Column(Integer, ForeignKey('foods.id'), nullable=False)
     meal_id = Column(Integer, ForeignKey('meals.id'), nullable=False)
-
     servings = Column(Integer, nullable=False)
 
-    food = relationship("Food", back_populates="food_meal")
-    meal = relationship("Meal", back_populates="food_meal")
-
+    food = relationship("Food", back_populates="food_meals", overlaps="meals,foods")
+    meal = relationship("Meal", back_populates="food_meals", overlaps="foods,meals")

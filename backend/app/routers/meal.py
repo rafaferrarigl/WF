@@ -1,39 +1,20 @@
-from __future__ import annotations
-
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
-
-from app.database import DBSession  # noqa: TC001
-from app.models.food import Food
+from app.database import DBSession
 from app.models.food_meal import FoodMeal
 from app.models.meal import Meal
-from app.routers.auth import AutoAdminUser  # noqa: TC001
-from app.routers.food import FoodResponse
+from app.routers.auth import AutoAdminUser
+from app.routers.food import FoodData
 
-router = APIRouter(
-    prefix='/meals',
-    tags=['diets']
-)
+router = APIRouter(prefix="/meals", tags=["diets"])
 
-
-# ----------------------  Esquemas Pydantic ----------------------
-
-
-
-class FoodMealCreate(BaseModel):
-    food_id: int
-    servings: int
-
-class MealCreate(BaseModel):
-    name: str
-    description: str | None = None
-    foods: list[FoodMealCreate] = []
 
 class FoodMealResponse(BaseModel):
     id: int
-    food: FoodResponse
+    food: FoodData
     servings: int
     model_config = {"from_attributes": True}
+
 
 class MealResponse(BaseModel):
     id: int
@@ -41,67 +22,52 @@ class MealResponse(BaseModel):
     foods: list[FoodMealResponse] = []
     model_config = {"from_attributes": True}
 
-# ----------------------Crear comida----------------------
-@router.post('/', status_code=status.HTTP_201_CREATED)
+
+class MealCreate(BaseModel):
+    name: str
+    description: str | None = None
+
+
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=MealResponse)
 async def create_meal(
     meal: MealCreate,
     db: DBSession,
-    current_user: AutoAdminUser,  # noqa: ARG001
-) -> MealResponse:
+    current_user: AutoAdminUser
+):
     new_meal = Meal(
         name=meal.name,
-        description=meal.description,
-
+        description=meal.description
     )
     db.add(new_meal)
     db.commit()
     db.refresh(new_meal)
 
-    for fd in meal.foods:
+    return MealResponse(
+        id=new_meal.id,
+        name=new_meal.name,
+        foods=[]
+    )
 
-        foods = db.query(Food).filter(Food.id == fd.food_id).first()
-        if not foods:
-            raise HTTPException(
-                status_code=404,
-                detail=f'Comida {fd.food_id} no encontrada'
+# ---------------------- Ver todas las meals ----------------------
+@router.get("/", response_model=list[MealResponse])
+async def get_all_meals(db: DBSession, current_user: AutoAdminUser):
+    meals = db.query(Meal).all()
+    response = []
+
+    for meal in meals:
+        foods_in_meal = [
+            FoodMealResponse(
+                id=fm.id,
+                food=FoodData.model_validate(fm.food),
+                servings=fm.servings
             )
+            for fm in meal.food_meals
+        ]
 
-        meal_fd = FoodMeal(
-            meal_id=new_meal.id,
-            food_id=fd.food_id,
-            servings=fd.servings,
-        )
+        response.append(MealResponse(
+            id=meal.id,
+            name=meal.name,
+            foods=foods_in_meal
+        ))
 
-        db.add(meal_fd)
-
-    db.commit()
-    db.refresh(new_meal)
-
-
-
-    return new_meal
-
-
-# ----------------------Ver todas las comidas ----------------------
-@router.get('/')
-async def get_all_meals(
-    db: DBSession,
-    current_user: AutoAdminUser,  # noqa: ARG001
-) -> list[MealResponse]:
-    return db.query(Meal).all()
-
-
-
-
-#ToDo
-# ---------------------- Ver una comida específica ----------------------
-# @router.get('/{meal_id}')
-# async def get_meal(
-#     meal_id: int,
-#     db: DBSession,
-#     current_user: AutoAdminUser,  # noqa: ARG001
-# ) -> MealResponse:
-#     meal = db.query(Meal).filter(Meal.id == meal_id).first()
-#     if not meal:
-#         raise HTTPException(status_code=404, detail='Comida no encontrada.')
-#     return meal
+    return response

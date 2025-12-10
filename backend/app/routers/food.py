@@ -1,63 +1,100 @@
-from __future__ import annotations
-
-from typing import Any, Coroutine
-
-from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel
-
-from app.database import DBSession  # noqa: TC001
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
+from fatsecret import Fatsecret
+from os import environ
+from app.database import DBSession
 from app.models.food import Food
-from app.routers.auth import AutoAdminUser  # noqa: TC001
+from app.models.food_meal import FoodMeal
+from app.models.meal import Meal
+from app.routers.auth import AutoAdminUser
+
+router = APIRouter(prefix="/foods", tags=["diets"])
+
+consumer_key = environ['CONSUMER_KEY']
+consumer_secret = environ['CONSUMER_SECRET']
+fs = Fatsecret(consumer_key, consumer_secret)
 
 
-router = APIRouter(prefix='/foods', tags=['diets'])
+class FoodSearchRequest(BaseModel):
+    query: str
 
 
-# ---------------------- Esquemas Pydantic ----------------------
-class FoodCreate(BaseModel):
-    name: str
-    calories_per_serving: float
-    carbs_per_serving: float
-    fats_per_serving: float
-    protein_per_serving: float
-    food_url: str
-
-
-class FoodResponse(BaseModel):
+class FoodData(BaseModel):
     id: int
     name: str
-    calories_per_serving: float
-    carbs_per_serving: float
-    fats_per_serving: float
-    protein_per_serving: float
-    food_url: str
+    serving: str
+    calories: float
+    fats: float
+    carbs: float
+    protein: float
+    url: str
+
+    model_config = {"from_attributes": True}
+
+    @classmethod
+    def from_description(cls, data: dict, food_description: str):
+        serving, contents = food_description.split(" - ", maxsplit=1)
+        contents = contents.split(" | ", maxsplit=3)
+        return cls(
+            id=int(data['food_id']),
+            name=data['food_name'],
+            url=data['food_url'],
+            serving=serving,
+            calories=float(contents[0][10:-4]),
+            fats=float(contents[1][5:-1]),
+            carbs=float(contents[2][7:-1]),
+            protein=float(contents[3][9:-1])
+        )
 
 
-# ----------------------  Agregar alimento a una comida ----------------------
-@router.post('/food}', status_code=status.HTTP_201_CREATED)
+class FoodDataForAdd(FoodData):
+    servings: int
+
+
+# ---------------------- SEARCH ----------------------
+@router.post("/search", response_model=list[FoodData])
+async def search_foods(req: FoodSearchRequest):
+    results = fs.foods_search(req.query)
+    if not results:
+        raise HTTPException(404, "No se encontraron alimentos.")
+
+    return [FoodData.from_description(f, f['food_description']) for f in results]
+
+
+# ---------------------- ADD FOOD TO MEAL ----------------------
+@router.post("/meal/{meal_id}")
 async def add_food_to_meal(
-    food: FoodCreate,
-    db: DBSession,
-    current_user: AutoAdminUser,  # noqa: ARG001
-) -> FoodResponse:
+        meal_id: int,
+        food_data: FoodDataForAdd,
+        db: DBSession,
+        current_user: AutoAdminUser
+):
+    meal = db.query(Meal).filter(Meal.id == meal_id).first()
+    if not meal:
+        raise HTTPException(status_code=404, detail='Comida no encontrada.')
 
-    new_food = Food(
-        name=food.name,
-        calories_per_serving=food.calories_per_serving,
-        carbs_per_serving=food.carbs_per_serving,
-        fats_per_serving=food.fats_per_serving,
-        protein_per_serving=food.protein_per_serving
+    food = db.query(Food).filter(Food.name == food_data.name).first()
+    if not food:
+        food = Food(
+            name=food_data.name,
+            serving=food_data.serving,
+            calories=food_data.calories,
+            carbs=food_data.carbs,
+            fats=food_data.fats,
+            protein=food_data.protein,
+            url=food_data.url
+        )
+        db.add(food)
+        db.commit()
+        db.refresh(food)
+
+    # Crear relación con Meal
+    food_meal = FoodMeal(
+        meal_id=meal_id,
+        food_id=food.id,
+        servings=food_data.servings
     )
-    db.add(new_food)
+    db.add(food_meal)
     db.commit()
-    db.refresh(new_food)
-    return new_food
 
-
-# ---------------------- Ver alimentos de una comida ----------------------
-@router.get('/')
-async def get_foods_by_meal(
-    db: DBSession,
-    current_user: AutoAdminUser,  # noqa: ARG001
-) -> list[type[Food]]:
-    return db.query(Food).all()
+    return {"message": "Food added", "food_id": food.id}
