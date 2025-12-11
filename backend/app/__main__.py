@@ -33,6 +33,7 @@ async def get_me(user: AutoUser) -> AutoUser:
     return user
 
 
+
 def main() -> None:
     db_user = environ['DB_USER']
     db_pass = environ['DB_PASS']
