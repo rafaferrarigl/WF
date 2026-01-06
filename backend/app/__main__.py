@@ -11,7 +11,7 @@ from app.routers import auth, diets, exercises, food, meal, routines
 from app.routers.auth import AutoUser  # noqa: TC001
 
 
-app = FastAPI()
+app = FastAPI(root_path='/api')
 app.include_router(auth.router)
 app.include_router(routines.router)
 app.include_router(diets.router)
