@@ -19,7 +19,7 @@ export interface User {
 })
 export class UserService {
 
-  private me_url = 'http://127.0.0.1:8443/auth/me';
+  private me_url = 'https://rfg.stickm4n.dev/api/auth/me';
   private http = inject(HttpClient);
 
   getCurrentUser() {

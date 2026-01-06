@@ -7,8 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
-  private login_url = 'http://127.0.0.1:8443/auth/login';
-  private me_url = 'http://127.0.0.1:8443/auth/me';
+  private login_url = 'https://rfg.stickm4n.dev/api/auth/login';
+  private me_url = 'https://rfg.stickm4n.dev/api/auth/me';
 
   constructor(private http: HttpClient) {}
 
