@@ -12,7 +12,7 @@
 
     handle {
         root * ./www
-        try_files {path} /index.html
+        try_files {path} /index.csr.html
         file_server
     }
 }
