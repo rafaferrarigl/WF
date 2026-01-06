@@ -21,6 +21,7 @@ WORKDIR /app
 
 
 COPY security security
+COPY public ./www/public
 COPY --from=builder /build/dist/frontend/browser ./www
 COPY Caddyfile /etc/caddy/Caddyfile
 
