@@ -1,6 +1,14 @@
 name: rfg
 
 services:
+  frontend:
+    build:
+      context: frontend
+    ports:
+      - "5704:443"
+    restart: unless-stopped
+    pull_policy: build
+
   backend:
     build:
       context: backend
@@ -12,8 +20,6 @@ services:
       ALGORITHM: ${ALGORITHM}
       CONSUMER_KEY: ${CONSUMER_KEY}
       CONSUMER_SECRET: ${CONSUMER_SECRET}
-    ports:
-      - "5704:443"
     depends_on:
       database:
         condition: service_healthy

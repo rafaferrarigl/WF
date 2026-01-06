@@ -1,0 +1,18 @@
+:443 {
+    encode gzip
+    tls security/certificate security/private-key
+
+    handle_path /api/* {
+        reverse_proxy * https://backend {
+            transport http {
+                tls_insecure_skip_verify
+            }
+        }
+    }
+
+    handle {
+        root * ./www
+        try_files {path} /index.html
+        file_server
+    }
+}
